@@ -2,8 +2,8 @@ import { useRef, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { downloadCanvasAsPNG, loadImage, formatDuration } from './utils.js';
 
-const CANVAS_WIDTH = 900;
-const CANVAS_HEIGHT = 1600;
+const CANVAS_WIDTH = 390;
+const CANVAS_HEIGHT = 844;
 
 // SVG icons as data URLs
 const icons = {
@@ -41,7 +41,7 @@ const SpotifyCanvas = ({ trackData, currentTimeMs }) => {
 
     const ctx = canvas.getContext('2d');
     const dpr = window.devicePixelRatio || 1;
-    
+
     // Set canvas size
     canvas.width = CANVAS_WIDTH * dpr;
     canvas.height = CANVAS_HEIGHT * dpr;
@@ -52,46 +52,51 @@ const SpotifyCanvas = ({ trackData, currentTimeMs }) => {
     // Clear canvas
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-    // Background gradient
+    // Background - darker, more accurate to Spotify
     const gradient = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
-    gradient.addColorStop(0, '#121212');
-    gradient.addColorStop(1, '#2b2b2b');
+    gradient.addColorStop(0, '#1a1a1a');
+    gradient.addColorStop(1, '#121212');
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-    // Header section
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-    ctx.fillRect(0, 0, CANVAS_WIDTH, 120);
+    // Top section with header
+    const headerHeight = 80;
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+    ctx.fillRect(0, 0, CANVAS_WIDTH, headerHeight);
 
     // Header text - "PLAYING FROM ALBUM"
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-    ctx.font = '12px Inter, sans-serif';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+    ctx.font = '11px Inter, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('PLAYING FROM ALBUM', CANVAS_WIDTH / 2, 30);
+    ctx.fillText('PLAYING FROM ALBUM', CANVAS_WIDTH / 2, 25);
 
-    // Album name
+    // Album name in header
     ctx.fillStyle = 'white';
-    ctx.font = 'bold 16px Inter, sans-serif';
-    ctx.fillText(trackData.albumName, CANVAS_WIDTH / 2, 55);
+    ctx.font = '600 14px Inter, sans-serif';
+    ctx.fillText(trackData.albumName, CANVAS_WIDTH / 2, 45);
 
     // Header icons
     try {
       const downArrowImg = await loadImage(icons.downArrow);
       const kebabImg = await loadImage(icons.kebab);
-      ctx.drawImage(downArrowImg, 40, 20, 24, 24);
-      ctx.drawImage(kebabImg, CANVAS_WIDTH - 64, 20, 24, 24);
+      ctx.drawImage(downArrowImg, 16, 18, 20, 20);
+      ctx.drawImage(kebabImg, CANVAS_WIDTH - 36, 18, 20, 20);
     } catch (error) {
       console.warn('Failed to load header icons:', error);
     }
 
-    // Album artwork card
-    const albumCardY = 140;
-    const albumCardSize = 400;
-    const albumCardX = (CANVAS_WIDTH - albumCardSize) / 2;
+    // Album artwork section - much larger and more prominent
+    const albumSection = {
+      y: headerHeight + 30,
+      cardSize: CANVAS_WIDTH - 60, // Much larger
+      padding: 12
+    };
+
+    const albumCardX = (CANVAS_WIDTH - albumSection.cardSize) / 2;
 
     // Album card background (white rounded rectangle)
     ctx.fillStyle = 'white';
-    drawRoundedRect(ctx, albumCardX, albumCardY, albumCardSize, albumCardSize, 20);
+    drawRoundedRect(ctx, albumCardX, albumSection.y, albumSection.cardSize, albumSection.cardSize, 12);
     ctx.fill();
 
     // Album artwork
@@ -99,61 +104,64 @@ const SpotifyCanvas = ({ trackData, currentTimeMs }) => {
       try {
         const albumImg = await loadImage(trackData.albumImage);
         ctx.save();
-        drawRoundedRect(ctx, albumCardX + 20, albumCardY + 20, albumCardSize - 40, albumCardSize - 40, 12);
+        const artworkSize = albumSection.cardSize - (albumSection.padding * 2);
+        drawRoundedRect(ctx, albumCardX + albumSection.padding, albumSection.y + albumSection.padding, artworkSize, artworkSize, 8);
         ctx.clip();
-        ctx.drawImage(albumImg, albumCardX + 20, albumCardY + 20, albumCardSize - 40, albumCardSize - 40);
+        ctx.drawImage(albumImg, albumCardX + albumSection.padding, albumSection.y + albumSection.padding, artworkSize, artworkSize);
         ctx.restore();
       } catch (error) {
         console.warn('Failed to load album image:', error);
         // Draw placeholder
         ctx.fillStyle = '#f0f0f0';
-        drawRoundedRect(ctx, albumCardX + 20, albumCardY + 20, albumCardSize - 40, albumCardSize - 40, 12);
+        const artworkSize = albumSection.cardSize - (albumSection.padding * 2);
+        drawRoundedRect(ctx, albumCardX + albumSection.padding, albumSection.y + albumSection.padding, artworkSize, artworkSize, 8);
         ctx.fill();
       }
     }
 
-    // Track title
-    const titleY = albumCardY + albumCardSize + 60;
+    // Track information section
+    const trackInfoY = albumSection.y + albumSection.cardSize + 40;
+
+    // Track title - larger and bolder
     ctx.fillStyle = 'white';
-    ctx.font = 'bold 32px Inter, sans-serif';
+    ctx.font = 'bold 24px Inter, sans-serif';
     ctx.textAlign = 'left';
-    
-    // Measure text width for positioning
+
+    const titleX = 30;
     const titleText = trackData.name;
     const titleMetrics = ctx.measureText(titleText);
-    const titleX = 60;
-    ctx.fillText(titleText, titleX, titleY);
+    ctx.fillText(titleText, titleX, trackInfoY);
 
-    // Green check badge
-    const checkBadgeX = titleX + titleMetrics.width + 20;
-    const checkBadgeY = titleY - 20;
+    // Green check badge - positioned better
+    const checkBadgeX = titleX + titleMetrics.width + 16;
+    const checkBadgeY = trackInfoY - 16;
     ctx.fillStyle = '#1DB954';
     ctx.beginPath();
-    ctx.arc(checkBadgeX, checkBadgeY, 12, 0, 2 * Math.PI);
+    ctx.arc(checkBadgeX, checkBadgeY, 10, 0, 2 * Math.PI);
     ctx.fill();
 
     // Check icon
     try {
       const checkImg = await loadImage(icons.check);
-      ctx.drawImage(checkImg, checkBadgeX - 8, checkBadgeY - 8, 16, 16);
+      ctx.drawImage(checkImg, checkBadgeX - 6, checkBadgeY - 6, 12, 12);
     } catch (error) {
       console.warn('Failed to load check icon:', error);
     }
 
-    // Artist names
-    const artistY = titleY + 40;
+    // Artist names - better positioned
+    const artistY = trackInfoY + 32;
     ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-    ctx.font = '18px Inter, sans-serif';
+    ctx.font = '16px Inter, sans-serif';
     ctx.fillText(trackData.artists.join(', '), titleX, artistY);
 
-    // Progress bar
-    const progressY = artistY + 80;
-    const progressBarWidth = CANVAS_WIDTH - 120;
-    const progressBarX = 60;
+    // Progress bar section - positioned lower
+    const progressY = CANVAS_HEIGHT - 280;
+    const progressBarWidth = CANVAS_WIDTH - 60;
+    const progressBarX = 30;
     const progressBarHeight = 4;
 
     // Progress bar background
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.18)';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
     drawRoundedRect(ctx, progressBarX, progressY, progressBarWidth, progressBarHeight, 2);
     ctx.fill();
 
@@ -167,75 +175,84 @@ const SpotifyCanvas = ({ trackData, currentTimeMs }) => {
     // Time labels
     const currentTimeText = formatDuration(currentTimeMs);
     const totalTimeText = formatDuration(trackData.durationMs);
-    
+
     ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-    ctx.font = '14px Inter, sans-serif';
+    ctx.font = '12px Inter, sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillText(currentTimeText, progressBarX, progressY + 30);
+    ctx.fillText(currentTimeText, progressBarX, progressY + 22);
     ctx.textAlign = 'right';
-    ctx.fillText(totalTimeText, progressBarX + progressBarWidth, progressY + 30);
+    ctx.fillText(totalTimeText, progressBarX + progressBarWidth, progressY + 22);
 
-    // Playback controls
-    const controlsY = progressY + 80;
+    // Playback controls - positioned properly
+    const controlsY = progressY + 60;
     const centerX = CANVAS_WIDTH / 2;
-    
-    // Play button (large central button)
-    ctx.fillStyle = 'white';
-    ctx.beginPath();
-    ctx.arc(centerX, controlsY, 32, 0, 2 * Math.PI);
-    ctx.fill();
 
-    // Play triangle
-    ctx.fillStyle = 'black';
-    ctx.beginPath();
-    ctx.moveTo(centerX - 8, controlsY - 12);
-    ctx.lineTo(centerX - 8, controlsY + 12);
-    ctx.lineTo(centerX + 12, controlsY);
-    ctx.closePath();
-    ctx.fill();
+    // Control icons with proper spacing
+    const iconSpacing = 60;
 
-    // Other control icons
     try {
       const shuffleImg = await loadImage(icons.shuffle);
       const previousImg = await loadImage(icons.previous);
       const nextImg = await loadImage(icons.next);
       const devicesImg = await loadImage(icons.devices);
 
-      ctx.drawImage(shuffleImg, centerX - 140, controlsY - 10, 20, 20);
-      ctx.drawImage(previousImg, centerX - 80, controlsY - 10, 20, 20);
-      ctx.drawImage(nextImg, centerX + 60, controlsY - 10, 20, 20);
-      ctx.drawImage(devicesImg, centerX + 120, controlsY - 10, 20, 20);
+      // Shuffle icon
+      ctx.drawImage(shuffleImg, centerX - iconSpacing * 2, controlsY - 10, 20, 20);
+
+      // Previous icon
+      ctx.drawImage(previousImg, centerX - iconSpacing, controlsY - 10, 20, 20);
+
+      // Next icon
+      ctx.drawImage(nextImg, centerX + iconSpacing - 20, controlsY - 10, 20, 20);
+
+      // Devices icon
+      ctx.drawImage(devicesImg, centerX + iconSpacing * 2 - 20, controlsY - 10, 20, 20);
     } catch (error) {
       console.warn('Failed to load control icons:', error);
     }
 
-    // Bottom icons (Share and More)
-    const bottomIconsY = CANVAS_HEIGHT - 200;
+    // Central play button - larger and more prominent
+    ctx.fillStyle = 'white';
+    ctx.beginPath();
+    ctx.arc(centerX, controlsY, 28, 0, 2 * Math.PI);
+    ctx.fill();
+
+    // Play triangle - properly centered
+    ctx.fillStyle = 'black';
+    ctx.beginPath();
+    ctx.moveTo(centerX - 6, controlsY - 10);
+    ctx.lineTo(centerX - 6, controlsY + 10);
+    ctx.lineTo(centerX + 10, controlsY);
+    ctx.closePath();
+    ctx.fill();
+
+    // Bottom icons (Share and More) - positioned better
+    const bottomIconsY = CANVAS_HEIGHT - 120;
     try {
       const shareImg = await loadImage(icons.share);
       const moreImg = await loadImage(icons.kebab);
-      
-      ctx.drawImage(shareImg, CANVAS_WIDTH - 120, bottomIconsY, 20, 20);
-      ctx.drawImage(moreImg, CANVAS_WIDTH - 80, bottomIconsY, 20, 20);
+
+      ctx.drawImage(shareImg, CANVAS_WIDTH - 80, bottomIconsY, 18, 18);
+      ctx.drawImage(moreImg, CANVAS_WIDTH - 50, bottomIconsY, 18, 18);
     } catch (error) {
       console.warn('Failed to load bottom icons:', error);
     }
 
-    // Lyrics tab (bottom sheet peek)
-    const lyricsTabY = CANVAS_HEIGHT - 80;
-    const lyricsTabWidth = 120;
-    const lyricsTabHeight = 40;
+    // Lyrics tab (bottom sheet peek) - more realistic
+    const lyricsTabY = CANVAS_HEIGHT - 60;
+    const lyricsTabWidth = 80;
+    const lyricsTabHeight = 32;
     const lyricsTabX = (CANVAS_WIDTH - lyricsTabWidth) / 2;
 
-    ctx.fillStyle = 'rgba(40, 40, 40, 0.95)';
-    drawRoundedRect(ctx, lyricsTabX, lyricsTabY, lyricsTabWidth, lyricsTabHeight, 20);
+    ctx.fillStyle = 'rgba(40, 40, 40, 0.9)';
+    drawRoundedRect(ctx, lyricsTabX, lyricsTabY, lyricsTabWidth, lyricsTabHeight, 16);
     ctx.fill();
 
     // Lyrics text
     ctx.fillStyle = 'white';
-    ctx.font = '14px Inter, sans-serif';
+    ctx.font = '12px Inter, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Lyrics', CANVAS_WIDTH / 2, lyricsTabY + 25);
+    ctx.fillText('Lyrics', CANVAS_WIDTH / 2, lyricsTabY + 20);
   }, [trackData, currentTimeMs]);
 
   useEffect(() => {
@@ -249,12 +266,33 @@ const SpotifyCanvas = ({ trackData, currentTimeMs }) => {
   };
 
   return (
-    <div className="flex flex-col items-center space-y-4">
+    <div className="flex flex-col items-center space-y-6">
       <div className="relative">
         <canvas
           ref={canvasRef}
-          className="rounded-lg shadow-2xl max-w-full h-auto"
-          style={{ aspectRatio: `${CANVAS_WIDTH}/${CANVAS_HEIGHT}` }}
+          className="rounded-3xl shadow-2xl border border-gray-800"
+          style={{
+            aspectRatio: `${CANVAS_WIDTH}/${CANVAS_HEIGHT}`,
+            maxWidth: '320px',
+            backgroundColor: '#121212',
+            boxShadow: `
+              0 25px 50px -12px rgba(0, 0, 0, 0.6),
+              0 0 0 1px rgba(255, 255, 255, 0.1),
+              inset 0 0 0 1px rgba(255, 255, 255, 0.05)
+            `
+          }}
+        />
+        {/* Mobile phone frame effect */}
+        <div className="absolute inset-0 rounded-3xl pointer-events-none"
+          style={{
+            background: `
+              linear-gradient(135deg,
+                rgba(255,255,255,0.1) 0%,
+                transparent 50%,
+                rgba(0,0,0,0.1) 100%
+              )
+            `
+          }}
         />
       </div>
       {trackData && (
