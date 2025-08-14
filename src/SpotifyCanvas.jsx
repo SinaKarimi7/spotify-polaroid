@@ -220,46 +220,51 @@ const SpotifyCanvas = ({ trackData, currentTimeMs, template = 'mobile' }) => {
     if (!posterRef.current || !trackData) return;
 
     try {
-      // Dynamic import to avoid bundling html2canvas if not needed
-      const html2canvas = (await import('html2canvas')).default;
-
-      const canvas = await html2canvas(posterRef.current, {
-        backgroundColor: 'transparent',
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        logging: false
+      // Import dom-to-image
+      // dom-to-image generally provides better font rendering and CSS handling
+      // than html2canvas, especially for complex layouts and transformations
+      const domtoimage = (await import('dom-to-image')).default;
+      
+      // Get the element's dimensions for proper scaling
+      const { width, height } = posterRef.current.getBoundingClientRect();
+      
+      // Create image with dom-to-image
+      // Using toPng method for better quality, with scale of 2 for higher resolution
+      const dataUrl = await domtoimage.toPng(posterRef.current, {
+        width: width * 2,
+        height: height * 2,
+        style: {
+          transform: 'scale(2)',
+          transformOrigin: 'top left',
+          width: `${width}px`,
+          height: `${height}px`
+        },
+        quality: 0.95,
+        bgcolor: 'transparent'
       });
-
-      // Create a new canvas with rounded corners and 1px crop
-      const finalCanvas = document.createElement('canvas');
-      const finalCtx = finalCanvas.getContext('2d');
-
-      // Crop 1px from each side
-      const cropSize = 2; // 1px * scale(2) = 2px to crop from each side
-      finalCanvas.width = canvas.width - (cropSize * 2);
-      finalCanvas.height = canvas.height - (cropSize * 2);
-
-      // Create rounded rectangle path
-      const radius = 16; // 8px * scale(2)
-      finalCtx.beginPath();
-      finalCtx.roundRect(0, 0, finalCanvas.width, finalCanvas.height, radius);
-      finalCtx.clip();
-
-      // Draw the original canvas onto the rounded canvas, cropping 1px from each side
-      finalCtx.drawImage(
-        canvas,
-        cropSize, cropSize, // Source x, y (crop from top-left)
-        finalCanvas.width, finalCanvas.height, // Source width, height
-        0, 0, // Destination x, y
-        finalCanvas.width, finalCanvas.height // Destination width, height
-      );
-
-      // Download the image
-      const link = document.createElement('a');
-      link.download = `${trackData.name || 'spotify-poster'}.png`;
-      link.href = finalCanvas.toDataURL();
-      link.click();
+      
+      // Create an image from the data URL
+      const img = new Image();
+      img.src = dataUrl;
+      
+      // When the image loads, draw it to a canvas to apply final effects if needed
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set the canvas size to match the image
+        canvas.width = img.width;
+        canvas.height = img.height;
+        
+        // Draw the image to the canvas
+        ctx.drawImage(img, 0, 0);
+        
+        // Download the image
+        const link = document.createElement('a');
+        link.download = `${trackData.name || 'spotify-polaroid'}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      };
     } catch (error) {
       console.error('Failed to generate poster:', error);
     }
