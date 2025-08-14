@@ -20,12 +20,27 @@ function App() {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
     const error = urlParams.get('error');
+    const processedCode = sessionStorage.getItem('processed_auth_code');
+    
+    // Debug logging for authentication flow
+    console.log('Auth state on load:', { 
+      isAuthenticated: isAuthenticated(), 
+      hasAuthCode: !!code,
+      hasError: !!error,
+      hasCodeVerifier: !!localStorage.getItem('code_verifier'),
+      processedCode
+    });
+
+    // Clean up URL immediately to prevent double processing on route changes or refreshes
+    if (code || error) {
+      window.history.replaceState({}, document.title, '/');
+    }
 
     if (error) {
       setError('Authentication failed. Please try again.');
-      // Clean up URL
-      window.history.replaceState({}, document.title, '/');
-    } else if (code) {
+    } else if (code && code !== processedCode) {
+      // Only process this code if we haven't seen it before
+      sessionStorage.setItem('processed_auth_code', code);
       handleAuthCallback(code);
     }
   }, []);
@@ -36,17 +51,37 @@ function App() {
       await exchangeCodeForToken(code);
       setIsLoggedIn(true);
       setError('');
-      // Clean up URL
-      window.history.replaceState({}, document.title, '/');
+      // Keep track that we've successfully processed this code
+      sessionStorage.setItem('processed_auth_code', code);
     } catch (error) {
       console.error('Auth callback error:', error);
-      setError('Failed to complete authentication. Please try again.');
+      
+      // Clear the processed code to allow retry
+      sessionStorage.removeItem('processed_auth_code');
+      
+      // More specific error message for 400 errors (already used code)
+      if (error.message && error.message.includes('400')) {
+        setError('Authentication code already used. This can happen if the page reloads during login.');
+      } else {
+        setError('Failed to complete authentication. Please try again.');
+      }
+      
+      // If the error is related to missing code verifier, automatically retry login
+      if (error.message === 'Code verifier not found') {
+        console.log('Code verifier missing, automatically retrying authentication...');
+        // Small delay to allow UI to update
+        setTimeout(() => {
+          initiateSpotifyLogin();
+        }, 500);
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleLogin = () => {
+    // Clean up any existing auth session state before starting a new flow
+    sessionStorage.removeItem('processed_auth_code');
     initiateSpotifyLogin();
   };
 

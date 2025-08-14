@@ -28,8 +28,8 @@ export async function initiateSpotifyLogin() {
   const codeVerifier = generateCodeVerifier();
   const codeChallenge = await generateCodeChallenge(codeVerifier);
   
-  // Store code_verifier in sessionStorage for later use
-  sessionStorage.setItem('code_verifier', codeVerifier);
+  // Store code_verifier in localStorage for persistence across redirects
+  localStorage.setItem('code_verifier', codeVerifier);
   
   const params = new URLSearchParams({
     client_id: CLIENT_ID,
@@ -45,7 +45,7 @@ export async function initiateSpotifyLogin() {
 
 // Exchange authorization code for access token
 export async function exchangeCodeForToken(code) {
-  const codeVerifier = sessionStorage.getItem('code_verifier');
+  const codeVerifier = localStorage.getItem('code_verifier');
   
   if (!codeVerifier) {
     throw new Error('Code verifier not found');
@@ -68,7 +68,7 @@ export async function exchangeCodeForToken(code) {
   });
   
   if (!response.ok) {
-    throw new Error('Failed to exchange code for token');
+    throw new Error(`Failed to exchange code for token: HTTP ${response.status}`);
   }
   
   const data = await response.json();
@@ -80,8 +80,8 @@ export async function exchangeCodeForToken(code) {
   }
   localStorage.setItem(TOKEN_EXPIRY_KEY, Date.now() + (data.expires_in * 1000));
   
-  // Clean up session storage
-  sessionStorage.removeItem('code_verifier');
+  // Clean up code verifier from storage
+  localStorage.removeItem('code_verifier');
   
   return data.access_token;
 }
