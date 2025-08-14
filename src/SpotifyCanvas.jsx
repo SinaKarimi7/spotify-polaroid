@@ -1,308 +1,232 @@
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef } from 'react';
 import PropTypes from 'prop-types';
-import { downloadCanvasAsPNG, loadImage, formatDuration } from './utils.js';
 
-const CANVAS_WIDTH = 390;
-const CANVAS_HEIGHT = 844;
-
-// SVG icons as data URLs
-const icons = {
-  downArrow: "data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10L12 15L17 10' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E",
-  kebab: "data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='12' cy='12' r='1' fill='white'/%3E%3Ccircle cx='12' cy='5' r='1' fill='white'/%3E%3Ccircle cx='12' cy='19' r='1' fill='white'/%3E%3C/svg%3E",
-  shuffle: "data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M16 3H13L16 6M16 3L13 6M16 3V6M4 17L8 13M4 3L16 17M8 7L4 3' stroke='%23b3b3b3' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E",
-  previous: "data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M15 5L10 10L15 15V5Z' fill='%23b3b3b3'/%3E%3Cpath d='M5 5H7V15H5V5Z' fill='%23b3b3b3'/%3E%3C/svg%3E",
-  next: "data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 5L10 10L5 15V5Z' fill='%23b3b3b3'/%3E%3Cpath d='M13 5H15V15H13V5Z' fill='%23b3b3b3'/%3E%3C/svg%3E",
-  devices: "data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='2' y='3' width='12' height='8' rx='1' stroke='%23b3b3b3' stroke-width='1.5'/%3E%3Cpath d='M6 15L10 15' stroke='%23b3b3b3' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M8 11V15' stroke='%23b3b3b3' stroke-width='1.5'/%3E%3Crect x='15' y='6' width='3' height='5' rx='0.5' stroke='%23b3b3b3' stroke-width='1.5'/%3E%3C/svg%3E",
-  share: "data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 12V16C4 16.5523 4.44772 17 5 17H15C15.5523 17 16 16.5523 16 16V12M8 6L10 4L12 6M10 4V12' stroke='%23b3b3b3' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E",
-  check: "data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M13.5 4.5L6 12L2.5 8.5' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"
-};
-
-// Helper function to draw rounded rectangles (fallback for older browsers)
-const drawRoundedRect = (ctx, x, y, width, height, radius) => {
-  ctx.beginPath();
-  ctx.moveTo(x + radius, y);
-  ctx.lineTo(x + width - radius, y);
-  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-  ctx.lineTo(x + width, y + height - radius);
-  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-  ctx.lineTo(x + radius, y + height);
-  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-  ctx.lineTo(x, y + radius);
-  ctx.quadraticCurveTo(x, y, x + radius, y);
-  ctx.closePath();
+// Spotify Icons extracted from the official Spotify web player
+const SpotifyIcons = {
+  ChevronDown: () => (
+    <svg role="img" aria-hidden="true" viewBox="0 0 24 24" className="fill-current">
+      <path d="M2.793 8.043a1 1 0 0 1 1.414 0L12 15.836l7.793-7.793a1 1 0 1 1 1.414 1.414L12 18.664 2.793 9.457a1 1 0 0 1 0-1.414" />
+    </svg>
+  ),
+  MoreHorizontal: () => (
+    <svg role="img" aria-hidden="true" viewBox="0 0 24 24" className="fill-current">
+      <path d="M4.5 13.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3m15 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3m-7.5 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
+    </svg>
+  ),
+  Shuffle: () => (
+    <svg role="img" aria-hidden="true" viewBox="0 0 16 16" className="fill-current">
+      <path d="M13.151.922a.75.75 0 1 0-1.06 1.06L13.109 3H11.16a3.75 3.75 0 0 0-2.873 1.34l-6.173 7.356A2.25 2.25 0 0 1 .39 12.5H0V14h.391a3.75 3.75 0 0 0 2.873-1.34l6.173-7.356a2.25 2.25 0 0 1 1.724-.804h1.947l-1.017 1.018a.75.75 0 0 0 1.06 1.06L15.98 3.75zM.391 3.5H0V2h.391c1.109 0 2.16.49 2.873 1.34L4.89 5.277l-.979 1.167-1.796-2.14A2.25 2.25 0 0 0 .39 3.5z" />
+      <path d="m7.5 10.723.98-1.167.957 1.14a2.25 2.25 0 0 0 1.724.804h1.947l-1.017-1.018a.75.75 0 1 1 1.06-1.06l2.829 2.828-2.829 2.828a.75.75 0 1 1-1.06-1.06L13.109 13H11.16a3.75 3.75 0 0 1-2.873-1.34l-.787-.938z" />
+    </svg>
+  ),
+  SkipBack: () => (
+    <svg role="img" aria-hidden="true" viewBox="0 0 16 16" className="fill-current">
+      <path d="M3.3 1a.7.7 0 0 1 .7.7v5.15l9.95-5.744a.7.7 0 0 1 1.05.606v12.575a.7.7 0 0 1-1.05.607L4 9.149V14.3a.7.7 0 0 1-.7.7H1.7a.7.7 0 0 1-.7-.7V1.7a.7.7 0 0 1 .7-.7z" />
+    </svg>
+  ),
+  Play: () => (
+    <svg role="img" aria-hidden="true" viewBox="0 0 16 16" className="fill-current">
+      <path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288z" />
+    </svg>
+  ),
+  SkipForward: () => (
+    <svg role="img" aria-hidden="true" viewBox="0 0 16 16" className="fill-current">
+      <path d="M12.7 1a.7.7 0 0 0-.7.7v5.15L2.05 1.107A.7.7 0 0 0 1 1.712v12.575a.7.7 0 0 0 1.05.607L12 9.149V14.3a.7.7 0 0 0 .7.7h1.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7z" />
+    </svg>
+  ),
+  Repeat: () => (
+    <svg role="img" aria-hidden="true" viewBox="0 0 16 16" className="fill-current">
+      <path d="M0 4.75A3.75 3.75 0 0 1 3.75 1h8.5A3.75 3.75 0 0 1 16 4.75v5a3.75 3.75 0 0 1-3.75 3.75H9.81l1.018 1.018a.75.75 0 1 1-1.06 1.06L6.939 12.75l2.829-2.828a.75.75 0 1 1 1.06 1.06L9.811 12h2.439a2.25 2.25 0 0 0 2.25-2.25v-5a2.25 2.25 0 0 0-2.25-2.25h-8.5A2.25 2.25 0 0 0 1.5 4.75v5A2.25 2.25 0 0 0 3.75 12H5v1.5H3.75A3.75 3.75 0 0 1 0 9.75z" />
+    </svg>
+  ),
+  AddToLiked: () => (
+    <svg role="img" aria-hidden="true" viewBox="0 0 24 24" className="fill-current">
+      <path d="M11.999 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18m-11 9c0-6.075 4.925-11 11-11s11 4.925 11 11-4.925 11-11 11-11-4.925-11-11" />
+      <path d="M17.999 12a1 1 0 0 1-1 1h-4v4a1 1 0 1 1-2 0v-4h-4a1 1 0 1 1 0-2h4V7a1 1 0 1 1 2 0v4h4a1 1 0 0 1 1 1" />
+    </svg>
+  ),
+  Queue: () => (
+    <svg role="img" aria-hidden="true" viewBox="0 0 16 16" className="fill-current">
+      <path d="M15 15H1v-1.5h14zm0-4.5H1V9h14zm-14-7A2.5 2.5 0 0 1 3.5 1h9a2.5 2.5 0 0 1 0 5h-9A2.5 2.5 0 0 1 1 3.5m2.5-1a1 1 0 0 0 0 2h9a1 1 0 1 0 0-2z" />
+    </svg>
+  ),
+  Heart: () => (
+    <svg role="img" aria-hidden="true" viewBox="0 0 16 16" className="fill-current">
+      <path d="M15.724 4.22A4.313 4.313 0 0012.192.814a4.269 4.269 0 00-3.622 1.13.837.837 0 01-1.14 0 4.272 4.272 0 00-6.21 5.855l5.916 7.05a1.128 1.128 0 001.727 0l5.916-7.05a4.228 4.228 0 00.945-3.577z" />
+    </svg>
+  )
 };
 
 const SpotifyCanvas = ({ trackData, currentTimeMs }) => {
-  const canvasRef = useRef(null);
+  const posterRef = useRef(null);
 
-  const drawCanvas = useCallback(async () => {
-    const canvas = canvasRef.current;
-    if (!canvas || !trackData) return;
-
-    const ctx = canvas.getContext('2d');
-    const dpr = window.devicePixelRatio || 1;
-
-    // Set canvas size
-    canvas.width = CANVAS_WIDTH * dpr;
-    canvas.height = CANVAS_HEIGHT * dpr;
-    canvas.style.width = `${CANVAS_WIDTH}px`;
-    canvas.style.height = `${CANVAS_HEIGHT}px`;
-    ctx.scale(dpr, dpr);
-
-    // Clear canvas
-    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-
-    // Background - darker, more accurate to Spotify
-    const gradient = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
-    gradient.addColorStop(0, '#1a1a1a');
-    gradient.addColorStop(1, '#121212');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-
-    // Top section with header
-    const headerHeight = 80;
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
-    ctx.fillRect(0, 0, CANVAS_WIDTH, headerHeight);
-
-    // Header text - "PLAYING FROM ALBUM"
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-    ctx.font = '11px Inter, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('PLAYING FROM ALBUM', CANVAS_WIDTH / 2, 25);
-
-    // Album name in header
-    ctx.fillStyle = 'white';
-    ctx.font = '600 14px Inter, sans-serif';
-    ctx.fillText(trackData.albumName, CANVAS_WIDTH / 2, 45);
-
-    // Header icons
-    try {
-      const downArrowImg = await loadImage(icons.downArrow);
-      const kebabImg = await loadImage(icons.kebab);
-      ctx.drawImage(downArrowImg, 16, 18, 20, 20);
-      ctx.drawImage(kebabImg, CANVAS_WIDTH - 36, 18, 20, 20);
-    } catch (error) {
-      console.warn('Failed to load header icons:', error);
-    }
-
-    // Album artwork section - much larger and more prominent
-    const albumSection = {
-      y: headerHeight + 30,
-      cardSize: CANVAS_WIDTH - 60, // Much larger
-      padding: 12
-    };
-
-    const albumCardX = (CANVAS_WIDTH - albumSection.cardSize) / 2;
-
-    // Album card background (white rounded rectangle)
-    ctx.fillStyle = 'white';
-    drawRoundedRect(ctx, albumCardX, albumSection.y, albumSection.cardSize, albumSection.cardSize, 12);
-    ctx.fill();
-
-    // Album artwork
-    if (trackData.albumImage) {
-      try {
-        const albumImg = await loadImage(trackData.albumImage);
-        ctx.save();
-        const artworkSize = albumSection.cardSize - (albumSection.padding * 2);
-        drawRoundedRect(ctx, albumCardX + albumSection.padding, albumSection.y + albumSection.padding, artworkSize, artworkSize, 8);
-        ctx.clip();
-        ctx.drawImage(albumImg, albumCardX + albumSection.padding, albumSection.y + albumSection.padding, artworkSize, artworkSize);
-        ctx.restore();
-      } catch (error) {
-        console.warn('Failed to load album image:', error);
-        // Draw placeholder
-        ctx.fillStyle = '#f0f0f0';
-        const artworkSize = albumSection.cardSize - (albumSection.padding * 2);
-        drawRoundedRect(ctx, albumCardX + albumSection.padding, albumSection.y + albumSection.padding, artworkSize, artworkSize, 8);
-        ctx.fill();
-      }
-    }
-
-    // Track information section
-    const trackInfoY = albumSection.y + albumSection.cardSize + 40;
-
-    // Track title - larger and bolder
-    ctx.fillStyle = 'white';
-    ctx.font = 'bold 24px Inter, sans-serif';
-    ctx.textAlign = 'left';
-
-    const titleX = 30;
-    const titleText = trackData.name;
-    const titleMetrics = ctx.measureText(titleText);
-    ctx.fillText(titleText, titleX, trackInfoY);
-
-    // Green check badge - positioned better
-    const checkBadgeX = titleX + titleMetrics.width + 16;
-    const checkBadgeY = trackInfoY - 16;
-    ctx.fillStyle = '#1DB954';
-    ctx.beginPath();
-    ctx.arc(checkBadgeX, checkBadgeY, 10, 0, 2 * Math.PI);
-    ctx.fill();
-
-    // Check icon
-    try {
-      const checkImg = await loadImage(icons.check);
-      ctx.drawImage(checkImg, checkBadgeX - 6, checkBadgeY - 6, 12, 12);
-    } catch (error) {
-      console.warn('Failed to load check icon:', error);
-    }
-
-    // Artist names - better positioned
-    const artistY = trackInfoY + 32;
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-    ctx.font = '16px Inter, sans-serif';
-    ctx.fillText(trackData.artists.join(', '), titleX, artistY);
-
-    // Progress bar section - positioned lower
-    const progressY = CANVAS_HEIGHT - 280;
-    const progressBarWidth = CANVAS_WIDTH - 60;
-    const progressBarX = 30;
-    const progressBarHeight = 4;
-
-    // Progress bar background
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-    drawRoundedRect(ctx, progressBarX, progressY, progressBarWidth, progressBarHeight, 2);
-    ctx.fill();
-
-    // Progress bar filled portion
-    const progress = currentTimeMs / trackData.durationMs;
-    const filledWidth = progressBarWidth * progress;
-    ctx.fillStyle = '#1DB954';
-    drawRoundedRect(ctx, progressBarX, progressY, filledWidth, progressBarHeight, 2);
-    ctx.fill();
-
-    // Time labels
-    const currentTimeText = formatDuration(currentTimeMs);
-    const totalTimeText = formatDuration(trackData.durationMs);
-
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-    ctx.font = '12px Inter, sans-serif';
-    ctx.textAlign = 'left';
-    ctx.fillText(currentTimeText, progressBarX, progressY + 22);
-    ctx.textAlign = 'right';
-    ctx.fillText(totalTimeText, progressBarX + progressBarWidth, progressY + 22);
-
-    // Playback controls - positioned properly
-    const controlsY = progressY + 60;
-    const centerX = CANVAS_WIDTH / 2;
-
-    // Control icons with proper spacing
-    const iconSpacing = 60;
+  const handleDownload = async () => {
+    if (!posterRef.current || !trackData) return;
 
     try {
-      const shuffleImg = await loadImage(icons.shuffle);
-      const previousImg = await loadImage(icons.previous);
-      const nextImg = await loadImage(icons.next);
-      const devicesImg = await loadImage(icons.devices);
+      // Dynamic import to avoid bundling html2canvas if not needed
+      const html2canvas = (await import('html2canvas')).default;
 
-      // Shuffle icon
-      ctx.drawImage(shuffleImg, centerX - iconSpacing * 2, controlsY - 10, 20, 20);
+      const canvas = await html2canvas(posterRef.current, {
+        backgroundColor: '#121212',
+        scale: 2, // Higher quality
+        useCORS: true,
+        allowTaint: true
+      });
 
-      // Previous icon
-      ctx.drawImage(previousImg, centerX - iconSpacing, controlsY - 10, 20, 20);
-
-      // Next icon
-      ctx.drawImage(nextImg, centerX + iconSpacing - 20, controlsY - 10, 20, 20);
-
-      // Devices icon
-      ctx.drawImage(devicesImg, centerX + iconSpacing * 2 - 20, controlsY - 10, 20, 20);
+      // Download the image
+      const link = document.createElement('a');
+      link.download = `${trackData.name || 'spotify-poster'}.png`;
+      link.href = canvas.toDataURL();
+      link.click();
     } catch (error) {
-      console.warn('Failed to load control icons:', error);
-    }
-
-    // Central play button - larger and more prominent
-    ctx.fillStyle = 'white';
-    ctx.beginPath();
-    ctx.arc(centerX, controlsY, 28, 0, 2 * Math.PI);
-    ctx.fill();
-
-    // Play triangle - properly centered
-    ctx.fillStyle = 'black';
-    ctx.beginPath();
-    ctx.moveTo(centerX - 6, controlsY - 10);
-    ctx.lineTo(centerX - 6, controlsY + 10);
-    ctx.lineTo(centerX + 10, controlsY);
-    ctx.closePath();
-    ctx.fill();
-
-    // Bottom icons (Share and More) - positioned better
-    const bottomIconsY = CANVAS_HEIGHT - 120;
-    try {
-      const shareImg = await loadImage(icons.share);
-      const moreImg = await loadImage(icons.kebab);
-
-      ctx.drawImage(shareImg, CANVAS_WIDTH - 80, bottomIconsY, 18, 18);
-      ctx.drawImage(moreImg, CANVAS_WIDTH - 50, bottomIconsY, 18, 18);
-    } catch (error) {
-      console.warn('Failed to load bottom icons:', error);
-    }
-
-    // Lyrics tab (bottom sheet peek) - more realistic
-    const lyricsTabY = CANVAS_HEIGHT - 60;
-    const lyricsTabWidth = 80;
-    const lyricsTabHeight = 32;
-    const lyricsTabX = (CANVAS_WIDTH - lyricsTabWidth) / 2;
-
-    ctx.fillStyle = 'rgba(40, 40, 40, 0.9)';
-    drawRoundedRect(ctx, lyricsTabX, lyricsTabY, lyricsTabWidth, lyricsTabHeight, 16);
-    ctx.fill();
-
-    // Lyrics text
-    ctx.fillStyle = 'white';
-    ctx.font = '12px Inter, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('Lyrics', CANVAS_WIDTH / 2, lyricsTabY + 20);
-  }, [trackData, currentTimeMs]);
-
-  useEffect(() => {
-    drawCanvas();
-  }, [drawCanvas]);
-
-  const handleDownload = () => {
-    if (canvasRef.current && trackData) {
-      downloadCanvasAsPNG(canvasRef.current, trackData.name);
+      console.error('Failed to generate poster:', error);
     }
   };
 
+  if (!trackData) return null;
+
+  const progress = Math.max(0, Math.min(100, (currentTimeMs / trackData.durationMs) * 100));
+  const currentTime = formatTime(currentTimeMs);
+  const totalTime = formatTime(trackData.durationMs);
+
+  function formatTime(ms) {
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  }
+
   return (
     <div className="flex flex-col items-center space-y-6">
-      <div className="relative">
-        <canvas
-          ref={canvasRef}
-          className="rounded-3xl shadow-2xl border border-gray-800"
-          style={{
-            aspectRatio: `${CANVAS_WIDTH}/${CANVAS_HEIGHT}`,
-            maxWidth: '320px',
-            backgroundColor: '#121212',
-            boxShadow: `
-              0 25px 50px -12px rgba(0, 0, 0, 0.6),
-              0 0 0 1px rgba(255, 255, 255, 0.1),
-              inset 0 0 0 1px rgba(255, 255, 255, 0.05)
-            `
-          }}
-        />
-        {/* Mobile phone frame effect */}
-        <div className="absolute inset-0 rounded-3xl pointer-events-none"
-          style={{
-            background: `
-              linear-gradient(135deg,
-                rgba(255,255,255,0.1) 0%,
-                transparent 50%,
-                rgba(0,0,0,0.1) 100%
-              )
-            `
-          }}
-        />
+      {/* Spotify Poster */}
+      <div
+        ref={posterRef}
+        className="relative bg-gradient-to-b from-gray-900 v-gray-800 to-black flex flex-col rounded-3xl shadow-2xl overflow-hidden"
+        style={{
+          width: '300px',
+          height: '650px',
+          fontFamily: 'system-ui, -apple-system, sans-serif'
+        }}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 text-white">
+          <div className="w-6 h-6">
+            <SpotifyIcons.ChevronDown />
+          </div>
+          <div className="text-center">
+            <div className="text-xs text-gray-300 uppercase tracking-wide">Playing from album</div>
+            <div className="text-xs font-medium">{trackData.albumName || 'Unknown Album'}</div>
+          </div>
+          <div className="w-6 h-6">
+            <SpotifyIcons.MoreHorizontal />
+          </div>
+        </div>
+
+        {/* Album Art */}
+        <div className="flex-1 flex items-center justify-center p-8">
+          <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-sm w-full">
+            {trackData.albumImage ? (
+              <img
+                src={trackData.albumImage}
+                alt={trackData.name}
+                className="w-full aspect-square object-cover rounded-lg"
+                crossOrigin="anonymous"
+              />
+            ) : (
+              <div className="w-full aspect-square bg-gray-200 rounded-lg flex items-center justify-center">
+                <span className="text-gray-400 text-4xl">♪</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Song Info */}
+        <div className="px-6 pb-4">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-white text-base font-medium">{trackData.name || 'Unknown Track'}</h2>
+              <p className="text-gray-300 text-xs">{trackData.artists?.join(', ') || 'Unknown Artist'}</p>
+            </div>
+            <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+              <div className="w-3 h-3 text-white">
+                <SpotifyIcons.AddToLiked />
+              </div>
+            </div>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between text-gray-300 text-sm mb-2">
+              <span>{currentTime}</span>
+              <span>{totalTime}</span>
+            </div>
+            <div className="w-full bg-gray-500 rounded-full h-1">
+              <div className="bg-white h-1 rounded-full" style={{ width: `${progress}%` }}></div>
+            </div>
+          </div>
+
+          {/* Controls */}
+          <div className="flex items-center justify-center space-x-8 mb-6">
+            {/* Shuffle */}
+            <div className="w-5 h-5 text-gray-300">
+              <SpotifyIcons.Shuffle />
+            </div>
+
+            {/* Previous */}
+            <div className="w-6 h-6 text-white">
+              <SpotifyIcons.SkipBack />
+            </div>
+
+            {/* Play */}
+            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+              <div className="w-5 h-5 text-black ml-0.5">
+                <SpotifyIcons.Play />
+              </div>
+            </div>
+
+            {/* Next */}
+            <div className="w-6 h-6 text-white">
+              <SpotifyIcons.SkipForward />
+            </div>
+
+            {/* Repeat */}
+            <div className="w-5 h-5 text-gray-300">
+              <SpotifyIcons.Repeat />
+            </div>
+          </div>
+
+          {/* Bottom Controls */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              {/* Lyrics */}
+              <svg className="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+              </svg>
+            </div>
+
+            <div className="flex items-center space-x-4">
+              {/* Share */}
+              <svg className="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z" />
+              </svg>
+
+              {/* Queue */}
+              <div className="w-5 h-5 text-gray-300">
+                <SpotifyIcons.Queue />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      {trackData && (
-        <button
-          onClick={handleDownload}
-          className="px-6 py-3 bg-spotify-green text-white font-semibold rounded-full hover:bg-green-500 transition-colors"
-        >
-          Download PNG
-        </button>
-      )}
+
+      {/* Download Button */}
+      <button
+        onClick={handleDownload}
+        className="px-6 py-3 bg-green-500 text-white font-semibold rounded-full hover:bg-green-600 transition-colors"
+      >
+        Download PNG
+      </button>
     </div>
   );
 };
