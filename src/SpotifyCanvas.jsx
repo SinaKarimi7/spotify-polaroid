@@ -238,21 +238,6 @@ const SpotifyCanvas = ({ trackData, currentTimeMs, template = 'mobile' }) => {
     return codeURL;
   };
 
-  // Fallback: Generate a visual representation if the API fails
-  const generateFallbackSpotifyCode = (trackId) => {
-    if (!trackId) return [];
-
-    const bars = [];
-    // Create a deterministic pattern from track ID
-    for (let i = 0; i < 40; i++) {
-      const charCode = trackId.charCodeAt(i % trackId.length);
-      const height = (charCode % 8) + 3; // Heights 3-10
-      const width = (charCode % 3) + 1; // Widths 1-3
-      bars.push({ height, width });
-    }
-    return bars;
-  };
-
   const handleDownload = async () => {
     if (!posterRef.current || !trackData) return;
 
@@ -327,7 +312,6 @@ const SpotifyCanvas = ({ trackData, currentTimeMs, template = 'mobile' }) => {
 
   // Generate Spotify Code URL for the current track
   const spotifyCodeURL = generateSpotifyCodeURL(trackData?.id);
-  const fallbackBars = generateFallbackSpotifyCode(trackData?.id);
 
   // Debug: Log the code URL to console
   console.log('Track ID:', trackData?.id);
@@ -401,30 +385,13 @@ const SpotifyCanvas = ({ trackData, currentTimeMs, template = 'mobile' }) => {
                       crossOrigin="anonymous"
                       onError={(e) => {
                         console.error('Failed to load Spotify Code:', e);
-                        e.target.style.display = 'none';
-                        e.target.nextElementSibling.style.display = 'flex';
                       }}
                     />
-                  ) : null}
-                  <div
-                    className="flex items-end justify-center h-full w-full"
-                    style={{
-                      display: spotifyCodeURL ? 'none' : 'flex',
-                      gap: '1px'
-                    }}
-                  >
-                    {fallbackBars.map((bar, index) => (
-                      <div
-                        key={index}
-                        className="bg-black"
-                        style={{
-                          width: `${bar.width * 2}px`,
-                          height: `${bar.height * 4}px`,
-                          minHeight: '12px'
-                        }}
-                      />
-                    ))}
-                  </div>
+                  ) : (
+                    <div className="flex items-center justify-center h-full w-full text-gray-500">
+                      <span className="text-sm">Spotify Code not available</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

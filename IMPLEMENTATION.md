@@ -184,7 +184,7 @@ The application handles various error scenarios:
 
 ## Current Features
 
-1. **Multiple Templates**: 
+1. **Multiple Templates**:
    - Mobile Player Style: Recreates Spotify's mobile interface
    - Polaroid Style: Clean, modern take on the classic polaroid format
 

@@ -21,10 +21,10 @@ function App() {
     const code = urlParams.get('code');
     const error = urlParams.get('error');
     const processedCode = sessionStorage.getItem('processed_auth_code');
-    
+
     // Debug logging for authentication flow
-    console.log('Auth state on load:', { 
-      isAuthenticated: isAuthenticated(), 
+    console.log('Auth state on load:', {
+      isAuthenticated: isAuthenticated(),
       hasAuthCode: !!code,
       hasError: !!error,
       hasCodeVerifier: !!localStorage.getItem('code_verifier'),
@@ -55,17 +55,17 @@ function App() {
       sessionStorage.setItem('processed_auth_code', code);
     } catch (error) {
       console.error('Auth callback error:', error);
-      
+
       // Clear the processed code to allow retry
       sessionStorage.removeItem('processed_auth_code');
-      
+
       // More specific error message for 400 errors (already used code)
       if (error.message && error.message.includes('400')) {
         setError('Authentication code already used. This can happen if the page reloads during login.');
       } else {
         setError('Failed to complete authentication. Please try again.');
       }
-      
+
       // If the error is related to missing code verifier, automatically retry login
       if (error.message === 'Code verifier not found') {
         console.log('Code verifier missing, automatically retrying authentication...');
@@ -234,7 +234,7 @@ function App() {
                 <div className="mt-4 bg-red-900 border border-red-700 text-red-100 px-4 py-3 rounded">
                   <p>{error}</p>
                   {error.includes("Access denied") || error.includes("Authentication expired") ? (
-                    <button 
+                    <button
                       onClick={handleLogout}
                       className="mt-2 bg-red-700 hover:bg-red-600 text-white py-1 px-4 rounded text-sm"
                     >
