@@ -224,10 +224,10 @@ const SpotifyCanvas = ({ trackData, currentTimeMs, template = 'mobile' }) => {
       // dom-to-image generally provides better font rendering and CSS handling
       // than html2canvas, especially for complex layouts and transformations
       const domtoimage = (await import('dom-to-image')).default;
-      
+
       // Get the element's dimensions for proper scaling
       const { width, height } = posterRef.current.getBoundingClientRect();
-      
+
       // Create image with dom-to-image
       // Using toPng method for better quality, with scale of 2 for higher resolution
       const dataUrl = await domtoimage.toPng(posterRef.current, {
@@ -242,26 +242,26 @@ const SpotifyCanvas = ({ trackData, currentTimeMs, template = 'mobile' }) => {
         quality: 0.95,
         bgcolor: 'transparent'
       });
-      
+
       // Create an image from the data URL
       const img = new Image();
       img.src = dataUrl;
-      
+
       // When the image loads, draw it to a canvas to apply final effects if needed
       img.onload = () => {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        
+
         // Set the canvas size to match the image
         canvas.width = img.width;
         canvas.height = img.height;
-        
+
         // Draw the image to the canvas
         ctx.drawImage(img, 0, 0);
-        
+
         // Download the image
         const link = document.createElement('a');
-        link.download = `${trackData.name || 'spotify-polaroid'}.png`;
+        link.download = `${trackData.artists?.join(', ')} - ${trackData.name}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
       };
