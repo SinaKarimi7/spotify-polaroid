@@ -1,5 +1,147 @@
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+
+// Spotify-style color extraction based on Reddit community insights
+const extractColorsFromImage = (imageUrl) => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      // Use smaller canvas for performance (64x64 is typical)
+      const size = 64;
+      canvas.width = size;
+      canvas.height = size;
+      
+      ctx.drawImage(img, 0, 0, size, size);
+      
+      try {
+        const imageData = ctx.getImageData(0, 0, size, size);
+        const data = imageData.data;
+        
+        // Extract and analyze colors
+        const colorFrequency = new Map();
+        
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+          const alpha = data[i + 3];
+          
+          if (alpha > 128) {
+            const hsl = rgbToHsl(r, g, b);
+            
+            // Apply Spotify's filtering logic:
+            // - Exclude very dark colors (lightness < 0.1)
+            // - Exclude very light colors (lightness > 0.9)
+            // - Exclude very desaturated colors (saturation < 0.3)
+            // - Prefer medium lightness values (0.3-0.7 range)
+            if (hsl.l > 0.1 && hsl.l < 0.9 && hsl.s > 0.3) {
+              // Create a simplified color key for frequency counting
+              const colorKey = `${Math.round(r/10)*10}-${Math.round(g/10)*10}-${Math.round(b/10)*10}`;
+              
+              if (!colorFrequency.has(colorKey)) {
+                colorFrequency.set(colorKey, {
+                  count: 0,
+                  r, g, b,
+                  saturation: hsl.s,
+                  lightness: hsl.l,
+                  hue: hsl.h
+                });
+              }
+              colorFrequency.get(colorKey).count++;
+            }
+          }
+        }
+        
+        const dominantColors = findSpotifyStyleColors(colorFrequency);
+        resolve(dominantColors);
+      } catch (error) {
+        console.error('Error extracting colors:', error);
+        resolve(getDefaultColors());
+      }
+    };
+    
+    img.onerror = () => resolve(getDefaultColors());
+    img.src = imageUrl;
+  });
+};
+
+// Convert RGB to HSL
+const rgbToHsl = (r, g, b) => {
+  r /= 255;
+  g /= 255;
+  b /= 255;
+  
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h, s, l = (max + min) / 2;
+  
+  if (max === min) {
+    h = s = 0;
+  } else {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h /= 6;
+  }
+  
+  return { h, s, l };
+};
+
+// Spotify-style color selection using frequency + saturation scoring
+const findSpotifyStyleColors = (colorFrequency) => {
+  if (colorFrequency.size === 0) return getDefaultColors();
+  
+  // Convert to array and score each color
+  const scoredColors = Array.from(colorFrequency.values()).map(color => {
+    // Reddit insight: "best ratio of saturation to frequency"
+    // Also prefer medium lightness values (0.4-0.6 range gets bonus)
+    const lightnessBonus = (color.lightness >= 0.3 && color.lightness <= 0.7) ? 1.5 : 1;
+    
+    // Score = frequency * saturation * lightness_bonus
+    const score = color.count * color.saturation * lightnessBonus;
+    
+    return { ...color, score };
+  });
+  
+  // Sort by score (highest first)
+  scoredColors.sort((a, b) => b.score - a.score);
+  
+  // Take the best scoring color
+  const primaryColor = scoredColors[0];
+  
+  if (!primaryColor) return getDefaultColors();
+  
+  const primary = {
+    r: Math.floor(primaryColor.r),
+    g: Math.floor(primaryColor.g),
+    b: Math.floor(primaryColor.b)
+  };
+  
+  // Create secondary color - much darker version
+  const secondary = {
+    r: Math.max(16, Math.floor(primary.r * 0.15)),
+    g: Math.max(16, Math.floor(primary.g * 0.15)),
+    b: Math.max(16, Math.floor(primary.b * 0.15))
+  };
+  
+  return { primary, secondary };
+};
+
+// Default fallback colors (Spotify-like grays)
+const getDefaultColors = () => ({
+  primary: { r: 83, g: 83, b: 83 },
+  secondary: { r: 18, g: 18, b: 18 }
+});
 
 // Spotify Icons extracted from the official Spotify web player
 const SpotifyIcons = {
@@ -59,6 +201,20 @@ const SpotifyIcons = {
 
 const SpotifyCanvas = ({ trackData, currentTimeMs }) => {
   const posterRef = useRef(null);
+  const [backgroundColors, setBackgroundColors] = useState(getDefaultColors());
+
+  // Extract colors from album art when trackData changes
+  useEffect(() => {
+    if (trackData?.albumImage) {
+      extractColorsFromImage(trackData.albumImage)
+        .then(colors => {
+          setBackgroundColors(colors);
+        })
+        .catch(error => {
+          console.error('Failed to extract colors:', error);
+        });
+    }
+  }, [trackData?.albumImage]);
 
   const handleDownload = async () => {
     if (!posterRef.current || !trackData) return;
@@ -97,15 +253,21 @@ const SpotifyCanvas = ({ trackData, currentTimeMs }) => {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   }
 
+  // Create dynamic gradient based on extracted colors
+  const dynamicGradient = `linear-gradient(to bottom, 
+    rgb(${backgroundColors.primary.r}, ${backgroundColors.primary.g}, ${backgroundColors.primary.b}), 
+    rgb(${backgroundColors.secondary.r}, ${backgroundColors.secondary.g}, ${backgroundColors.secondary.b}))`;
+
   return (
     <div className="flex flex-col items-center space-y-6">
       {/* Spotify Poster */}
       <div
         ref={posterRef}
-        className="relative bg-gradient-to-b from-gray-900 v-gray-800 to-black p-6 flex flex-col rounded-3xl shadow-2xl overflow-hidden spotify-ui"
+        className="relative p-6 flex flex-col rounded-3xl shadow-2xl overflow-hidden spotify-ui"
         style={{
           width: '360px',
-          height: '780px'
+          height: '780px',
+          background: dynamicGradient
         }}
       >
         {/* Header */}
