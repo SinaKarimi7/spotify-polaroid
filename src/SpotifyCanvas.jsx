@@ -202,6 +202,7 @@ const SpotifyIcons = {
 const SpotifyCanvas = ({ trackData, currentTimeMs, template = 'mobile' }) => {
   const posterRef = useRef(null);
   const [backgroundColors, setBackgroundColors] = useState(getDefaultColors());
+  const [coloredSpotifyCodeSVG, setColoredSpotifyCodeSVG] = useState(null);
 
   // Extract colors from album art when trackData changes
   useEffect(() => {
@@ -216,24 +217,50 @@ const SpotifyCanvas = ({ trackData, currentTimeMs, template = 'mobile' }) => {
     }
   }, [trackData?.albumImage]);
 
+  // Fetch and color the Spotify Code SVG when trackData changes
+  useEffect(() => {
+    if (trackData?.id && template === 'spotify-code') {
+      const spotifyCodeURL = generateSpotifyCodeURL(trackData.id, "svg");
+      const primaryColorRgb = `rgb(${backgroundColors.primary.r}, ${backgroundColors.primary.g}, ${backgroundColors.primary.b})`;
+
+      if (spotifyCodeURL) {
+        fetch(spotifyCodeURL)
+          .then(response => response.text())
+          .then(svgText => {
+            // Replace black color with the primary color
+            const coloredSVG = svgText
+              .replace(/fill="#000000"/g, `fill="${primaryColorRgb}"`)
+              .replace(/fill="black"/g, `fill="${primaryColorRgb}"`)
+              .replace(/fill="rgb(0,0,0)"/g, `fill="${primaryColorRgb}"`)
+              .replace(/stroke="#000000"/g, `stroke="${primaryColorRgb}"`)
+              .replace(/stroke="black"/g, `stroke="${primaryColorRgb}"`);
+
+            setColoredSpotifyCodeSVG(coloredSVG);
+          })
+          .catch(error => {
+            console.error('Failed to fetch Spotify Code SVG:', error);
+            setColoredSpotifyCodeSVG(null);
+          });
+      }
+    }
+  }, [trackData?.id, backgroundColors.primary, template]);
+
   // Generate real Spotify Code using Spotify's undocumented API
-  const generateSpotifyCodeURL = (trackId) => {
+  const generateSpotifyCodeURL = (trackId, format = "svg") => {
     if (!trackId) return null;
 
     // Construct Spotify URI from track ID
     const spotifyURI = `spotify:track:${trackId}`;
 
-    // Try different URL format based on community examples
-    // Option 1: Try with different parameters
-    const backgroundColor = "ffffff"; // Black background (try this first)
-    const barColor = "black"; // White bars
-    const width = "640"; // Larger width
-    const format = "png"; // Try JPEG format
+    // Use SVG format to get scalable vector graphics that we can color
+    const backgroundColor = "ffffff"; // White background
+    const barColor = "black"; // Default black (we'll change this with CSS)
+    const width = "640"; // Width
 
-    // The exact format from the community post
+    // Get SVG format for custom coloring
     const codeURL = `https://scannables.scdn.co/uri/plain/${format}/${backgroundColor}/${barColor}/${width}/${spotifyURI}`;
 
-    console.log('Generated Spotify Code URL:', codeURL);
+    console.log('Generated Spotify Code URL (SVG):', codeURL);
 
     return codeURL;
   };
@@ -310,10 +337,9 @@ const SpotifyCanvas = ({ trackData, currentTimeMs, template = 'mobile' }) => {
     rgb(${backgroundColors.primary.r}, ${backgroundColors.primary.g}, ${backgroundColors.primary.b}),
     rgb(${backgroundColors.secondary.r}, ${backgroundColors.secondary.g}, ${backgroundColors.secondary.b}))`;
 
-  // Generate Spotify Code URL for the current track
-  const spotifyCodeURL = generateSpotifyCodeURL(trackData?.id);
 
-  // Debug: Log the code URL to console
+  // Generate Spotify Code URL for SVG
+  const spotifyCodeURL = generateSpotifyCodeURL(trackData?.id, "svg");  // Debug: Log the code URL to console
   console.log('Track ID:', trackData?.id);
   console.log('Spotify Code URL:', spotifyCodeURL);
 
@@ -330,69 +356,69 @@ const SpotifyCanvas = ({ trackData, currentTimeMs, template = 'mobile' }) => {
             boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
           }}
         >
-          {/* Spotify Code Poster - Cover Art Style */}
+          {/* Spotify Code Poster - Polaroid Style */}
           <div
             ref={posterRef}
-            className="relative spotify-ui"
+            className="relative bg-white spotify-ui"
             style={{
-              width: '480px',
-              height: '480px', // Square format like album covers
+              width: '320px',
+              height: '400px',
               border: 'none',
-              outline: 'none',
-              overflow: 'hidden',
-              position: 'relative'
+              outline: 'none'
             }}
           >
-            {/* Album Art Background */}
-            <div
-              className="absolute inset-0 bg-cover bg-center"
-              style={{
-                backgroundImage: trackData?.albumImage ? `url(${trackData.albumImage})` : 'none',
-                backgroundColor: trackData?.albumImage ? 'transparent' : '#333'
-              }}
-            >
-              {/* Dark overlay for better text readability */}
-              <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+            {/* Photo Area (4/5 of height) */}
+            <div className="h-4/5 relative overflow-hidden">
+              {/* Dynamic Background */}
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: dynamicGradient
+                }}
+              />
+
+              {/* Album Art */}
+              <div className="relative z-10 flex items-center justify-center p-6 h-full">
+                {trackData?.albumImage ? (
+                  <img
+                    src={trackData.albumImage}
+                    alt={trackData.name}
+                    className="w-full h-full object-cover shadow-lg"
+                    style={{ maxWidth: '240px', maxHeight: '240px' }}
+                    crossOrigin="anonymous"
+                  />
+                ) : (
+                  <div className="w-48 h-48 bg-gray-200 flex items-center justify-center">
+                    <span className="text-gray-400 text-4xl">♪</span>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Spotify Logo at top */}
-            <div className="absolute top-6 left-6 z-20">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
-                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 17.317c-.218.361-.678.48-1.04.267-2.848-1.738-6.432-2.134-10.657-1.168-.411.094-.82-.193-.914-.604-.094-.411.193-.82.604-.914 4.613-1.055 8.555-.609 11.737 1.353.36.218.48.678.27 1.066zm1.486-3.301c-.274.446-.858.588-1.304.314-3.258-1.999-8.223-2.575-12.076-1.411-.514.155-1.056-.232-1.211-.746-.155-.514.232-1.056.746-1.211 4.396-1.332 9.974-.691 13.544 1.618.445.275.588.858.31 1.336zm.127-3.438c-3.906-2.32-10.352-2.535-14.077-1.404-.618.187-1.27-.162-1.457-.78-.187-.618.162-1.27.78-1.457 4.262-1.296 11.363-1.044 15.927 1.62.533.311.708 1.007.397 1.54-.311.533-1.007.708-1.54.397l-.03-.016z" />
-              </svg>
-            </div>
-
-            {/* Track Info at top right */}
-            <div className="absolute top-6 right-6 z-20 text-right">
-              <h2 className="text-white text-lg font-bold spotify-title leading-tight mb-1 max-w-48">
-                {trackData?.name || 'Unknown Track'}
-              </h2>
-              <p className="text-gray-200 text-sm font-normal leading-tight">
-                {trackData?.artists?.join(', ') || 'Unknown Artist'}
-              </p>
-            </div>
-
-            {/* Spotify Code at Bottom */}
-            <div className="absolute bottom-0 left-0 right-0 z-20">
-              <div className="bg-white mx-6 mb-6 rounded-lg p-3">
-                {/* Real Spotify Code - Full Width */}
-                <div className="flex items-center justify-center h-16">
-                  {spotifyCodeURL ? (
-                    <img
-                      src={spotifyCodeURL}
-                      alt="Spotify Code"
-                      className="w-full h-full object-contain"
-                      crossOrigin="anonymous"
-                      onError={(e) => {
-                        console.error('Failed to load Spotify Code:', e);
-                      }}
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center h-full w-full text-gray-500">
-                      <span className="text-sm">Spotify Code not available</span>
-                    </div>
-                  )}
-                </div>
+            {/* Caption Area with Spotify Code Only (1/5 of height) */}
+            <div className="h-1/5 bg-white flex items-center justify-center px-6 py-4">
+              {/* Spotify Code - Centered */}
+              <div className="flex items-center justify-center w-full h-full">
+                {coloredSpotifyCodeSVG ? (
+                  <div
+                    className="h-full w-full flex items-center justify-center"
+                    dangerouslySetInnerHTML={{ __html: coloredSpotifyCodeSVG }}
+                  />
+                ) : spotifyCodeURL ? (
+                  <img
+                    src={spotifyCodeURL}
+                    alt="Spotify Code"
+                    className="h-full w-full object-contain"
+                    crossOrigin="anonymous"
+                    onError={(e) => {
+                      console.error('Failed to load Spotify Code:', e);
+                    }}
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full w-full text-gray-400">
+                    <span className="text-sm">Spotify Code not available</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
