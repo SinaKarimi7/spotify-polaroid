@@ -199,7 +199,7 @@ const SpotifyIcons = {
   )
 };
 
-const SpotifyCanvas = ({ trackData, currentTimeMs }) => {
+const SpotifyCanvas = ({ trackData, currentTimeMs, template = 'mobile' }) => {
   const posterRef = useRef(null);
   const [backgroundColors, setBackgroundColors] = useState(getDefaultColors());
 
@@ -258,6 +258,68 @@ const SpotifyCanvas = ({ trackData, currentTimeMs }) => {
     rgb(${backgroundColors.primary.r}, ${backgroundColors.primary.g}, ${backgroundColors.primary.b}),
     rgb(${backgroundColors.secondary.r}, ${backgroundColors.secondary.g}, ${backgroundColors.secondary.b}))`;
 
+  // Render Polaroid template
+  if (template === 'polaroid') {
+    return (
+      <div className="flex flex-col items-center space-y-6">
+        {/* Polaroid Poster */}
+        <div
+          ref={posterRef}
+          className="relative bg-white rounded-lg shadow-2xl overflow-hidden spotify-ui"
+          style={{
+            width: '320px',
+            height: '400px'
+          }}
+        >
+          {/* Polaroid Photo Area */}
+          <div className="relative w-full h-4/5">
+            {/* Dynamic Background */}
+            <div 
+              className="absolute inset-0"
+              style={{ background: dynamicGradient }}
+            />
+            
+            {/* Album Art */}
+            <div className="relative z-10 flex items-center justify-center p-6 h-full">
+              {trackData?.albumImage ? (
+                <img
+                  src={trackData.albumImage}
+                  alt={trackData.name}
+                  className="w-full h-full object-cover rounded-lg shadow-lg"
+                  style={{ maxWidth: '240px', maxHeight: '240px' }}
+                  crossOrigin="anonymous"
+                />
+              ) : (
+                <div className="w-48 h-48 bg-gray-200 rounded-lg flex items-center justify-center">
+                  <span className="text-gray-400 text-4xl">♪</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Polaroid Caption Area */}
+          <div className="h-1/5 bg-white flex flex-col justify-center px-6">
+            <h3 className="text-black font-bold text-lg leading-tight mb-1 spotify-title">
+              {trackData?.name || 'Unknown Track'}
+            </h3>
+            <p className="text-gray-600 text-sm font-normal leading-tight">
+              {trackData?.artists?.join(', ') || 'Unknown Artist'}
+            </p>
+          </div>
+        </div>
+
+        {/* Download Button */}
+        <button
+          onClick={handleDownload}
+          className="px-6 py-3 bg-green-500 text-white font-bold rounded-full hover:bg-green-600 transition-colors spotify-ui"
+        >
+          Download PNG
+        </button>
+      </div>
+    );
+  }
+
+  // Render Mobile Spotify template (default)
   return (
     <div className="flex flex-col items-center space-y-6">
       {/* Spotify Poster */}
@@ -396,6 +458,7 @@ SpotifyCanvas.propTypes = {
     durationMs: PropTypes.number.isRequired,
   }),
   currentTimeMs: PropTypes.number.isRequired,
+  template: PropTypes.oneOf(['mobile', 'polaroid']),
 };
 
 export default SpotifyCanvas;
