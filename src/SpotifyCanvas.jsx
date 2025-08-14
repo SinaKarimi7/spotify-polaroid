@@ -102,11 +102,10 @@ const SpotifyCanvas = ({ trackData, currentTimeMs }) => {
       {/* Spotify Poster */}
       <div
         ref={posterRef}
-        className="relative bg-gradient-to-b from-gray-900 v-gray-800 to-black flex flex-col rounded-3xl shadow-2xl overflow-hidden"
+        className="relative bg-gradient-to-b from-gray-900 v-gray-800 to-black flex flex-col rounded-3xl shadow-2xl overflow-hidden spotify-ui"
         style={{
           width: '300px',
-          height: '650px',
-          fontFamily: 'system-ui, -apple-system, sans-serif'
+          height: '650px'
         }}
       >
         {/* Header */}
@@ -115,7 +114,7 @@ const SpotifyCanvas = ({ trackData, currentTimeMs }) => {
             <SpotifyIcons.ChevronDown />
           </div>
           <div className="text-center">
-            <div className="text-xs text-gray-300 uppercase tracking-wide">Playing from album</div>
+            <div className="text-xs text-gray-300 uppercase tracking-wide font-normal">Playing from album</div>
             <div className="text-xs font-medium">{trackData.albumName || 'Unknown Album'}</div>
           </div>
           <div className="w-6 h-6">
@@ -145,8 +144,8 @@ const SpotifyCanvas = ({ trackData, currentTimeMs }) => {
         <div className="px-6 pb-4">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-white text-base font-medium">{trackData.name || 'Unknown Track'}</h2>
-              <p className="text-gray-300 text-xs">{trackData.artists?.join(', ') || 'Unknown Artist'}</p>
+              <h2 className="text-white text-base font-bold spotify-title">{trackData.name || 'Unknown Track'}</h2>
+              <p className="text-gray-300 text-xs font-normal">{trackData.artists?.join(', ') || 'Unknown Artist'}</p>
             </div>
             <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
               <div className="w-3 h-3 text-white">
@@ -157,7 +156,7 @@ const SpotifyCanvas = ({ trackData, currentTimeMs }) => {
 
           {/* Progress Bar */}
           <div className="mb-6">
-            <div className="flex items-center justify-between text-gray-300 text-sm mb-2">
+            <div className="flex items-center justify-between text-gray-300 text-xs mb-2 font-normal">
               <span>{currentTime}</span>
               <span>{totalTime}</span>
             </div>
@@ -223,7 +222,7 @@ const SpotifyCanvas = ({ trackData, currentTimeMs }) => {
       {/* Download Button */}
       <button
         onClick={handleDownload}
-        className="px-6 py-3 bg-green-500 text-white font-semibold rounded-full hover:bg-green-600 transition-colors"
+        className="px-6 py-3 bg-green-500 text-white font-bold rounded-full hover:bg-green-600 transition-colors spotify-ui"
       >
         Download PNG
       </button>

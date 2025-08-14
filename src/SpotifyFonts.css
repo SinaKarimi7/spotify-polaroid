@@ -1,0 +1,55 @@
+/* Spotify Official Fonts */
+
+@font-face {
+    font-display: swap;
+    font-family: SpotifyMixUI;
+    font-weight: 700;
+    src: url(https://encore.scdn.co/fonts/SpotifyMixUI-Bold-4264b799009b1db5c491778b1bc8e5b7.woff2) format("woff2"),url(https://encore.scdn.co/fonts/SpotifyMixUI-Bold-05392dabcaa9fab302f9ddc047b15752.woff) format("woff");
+    unicode-range: u+0020-007e,u+00a0-00ac,u+00ae-0137,u+0139-0148,u+014a-017e,u+018f,u+01a0-01a1,u+01af-01b0,u+01cd-01d4,u+01e6-01e7,u+01f4-01f5,u+01fa-01ff,u+0218-021b,u+0226-0227,u+0232-0233,u+0237,u+0259,u+02bc,u+02c6-02c7,u+02d8-02dd,u+0300-0304,u+0306-030c,u+0312,u+031b,u+0323,u+0326-0328,u+0335-0338,u+0e3f,u+1e0c-1e0d,u+1e20-1e21,u+1e24-1e25,u+1e36-1e37,u+1e44-1e45,u+1e56-1e57,u+1e62-1e63,u+1e6c-1e6d,u+1e80-1e85,u+1e8a-1e8d,u+1e92-1e93,u+1e9e,u+1ea0-1ef9,u+2002-2003,u+2009-200a,u+2010-2011,u+2013-2015,u+2018-201a,u+201c-201e,u+2020-2022,u+2026,u+2030,u+2032-2033,u+2039-203a,u+2044,u+2070,u+2074-2079,u+2080-2089,u+20a6,u+20a9-20aa,u+20ac,u+20b4,u+20b8-20ba,u+20bd,u+20bf,u+2113,u+2116-2117,u+2122,u+2126,u+2160-2169,u+216c-216f,u+2190-2193,u+2196-2199,u+2202,u+2206,u+220f,u+2211-2212,u+2215,u+221a,u+221e,u+222b,u+2248,u+2260,u+2264-2265,u+fb01-fb02,u+ffff
+}
+
+@font-face {
+    font-display: swap;
+    font-family: SpotifyMixUI;
+    font-weight: 400;
+    src: url(https://encore.scdn.co/fonts/SpotifyMixUI-Regular-cc3b1de388efa4cbca6c75cebc24585e.woff2) format("woff2"),url(https://encore.scdn.co/fonts/SpotifyMixUI-Regular-b342a41ec78025c361c018e5d355ab21.woff) format("woff");
+    unicode-range: u+0020-007e,u+00a0-00ac,u+00ae-0137,u+0139-0148,u+014a-017e,u+018f,u+01a0-01a1,u+01af-01b0,u+01cd-01d4,u+01e6-01e7,u+01f4-01f5,u+01fa-01ff,u+0218-021b,u+0226-0227,u+0232-0233,u+0237,u+0259,u+02bc,u+02c6-02c7,u+02d8-02dd,u+0300-0304,u+0306-030c,u+0312,u+031b,u+0323,u+0326-0328,u+0335-0338,u+0e3f,u+1e0c-1e0d,u+1e20-1e21,u+1e24-1e25,u+1e36-1e37,u+1e44-1e45,u+1e56-1e57,u+1e62-1e63,u+1e6c-1e6d,u+1e80-1e85,u+1e8a-1e8d,u+1e92-1e93,u+1e9e,u+1ea0-1ef9,u+2002-2003,u+2009-200a,u+2010-2011,u+2013-2015,u+2018-201a,u+201c-201e,u+2020-2022,u+2026,u+2030,u+2032-2033,u+2039-203a,u+2044,u+2070,u+2074-2079,u+2080-2089,u+20a6,u+20a9-20aa,u+20ac,u+20b4,u+20b8-20ba,u+20bd,u+20bf,u+2113,u+2116-2117,u+2122,u+2126,u+2160-2169,u+216c-216f,u+2190-2193,u+2196-2199,u+2202,u+2206,u+220f,u+2211-2212,u+2215,u+221a,u+221e,u+222b,u+2248,u+2260,u+2264-2265,u+fb01-fb02,u+ffff
+}
+
+@font-face {
+    font-display: swap;
+    font-family: SpotifyMixUITitle;
+    font-weight: 800;
+    src: url(https://encore.scdn.co/fonts/SpotifyMixUITitleVariable-8769ccfde3379b7ebcadd9529b49d0cc.woff2) format("woff2 supports variations"),url(https://encore.scdn.co/fonts/SpotifyMixUITitleVariable-8769ccfde3379b7ebcadd9529b49d0cc.woff2) format("woff2-variations"),url(https://encore.scdn.co/fonts/SpotifyMixUITitle-Extrabold-ba6c73cd7f82c81e49cf2204017803ed.woff2) format("woff2"),url(https://encore.scdn.co/fonts/SpotifyMixUITitle-Extrabold-dd06104c9de7463b60455a65171cab06.woff) format("woff");
+    unicode-range: u+0020-007e,u+00a0-00ac,u+00ae-0137,u+0139-0148,u+014a-017e,u+018f,u+01a0-01a1,u+01af-01b0,u+01cd-01d4,u+01e6-01e7,u+01f4-01f5,u+01fa-01ff,u+0218-021b,u+0226-0227,u+0232-0233,u+0237,u+0259,u+02bc,u+02c6-02c7,u+02d8-02dd,u+0300-0304,u+0306-030c,u+0312,u+031b,u+0323,u+0326-0328,u+0335-0338,u+0e3f,u+1e0c-1e0d,u+1e20-1e21,u+1e24-1e25,u+1e36-1e37,u+1e44-1e45,u+1e56-1e57,u+1e62-1e63,u+1e6c-1e6d,u+1e80-1e85,u+1e8a-1e8d,u+1e92-1e93,u+1e9e,u+1ea0-1ef9,u+2002-2003,u+2009-200a,u+2010-2011,u+2013-2015,u+2018-201a,u+201c-201e,u+2020-2022,u+2026,u+2030,u+2032-2033,u+2039-203a,u+2044,u+2070,u+2074-2079,u+2080-2089,u+20a6,u+20a9-20aa,u+20ac,u+20b4,u+20b8-20ba,u+20bd,u+20bf,u+2113,u+2116-2117,u+2122,u+2126,u+2160-2169,u+216c-216f,u+2190-2193,u+2196-2199,u+2202,u+2206,u+220f,u+2211-2212,u+2215,u+221a,u+221e,u+222b,u+2248,u+2260,u+2264-2265,u+fb01-fb02,u+ffff
+}
+
+@font-face {
+    font-display: swap;
+    font-family: SpotifyMixUITitle;
+    font-weight: 700;
+    src: url(https://encore.scdn.co/fonts/SpotifyMixUITitleVariable-8769ccfde3379b7ebcadd9529b49d0cc.woff2) format("woff2 supports variations"),url(https://encore.scdn.co/fonts/SpotifyMixUITitleVariable-8769ccfde3379b7ebcadd9529b49d0cc.woff2) format("woff2-variations"),url(https://encore.scdn.co/fonts/SpotifyMixUITitle-Bold-37290f1de77f297fcc26d71e9afcf43f.woff2) format("woff2"),url(https://encore.scdn.co/fonts/SpotifyMixUITitle-Bold-72703891d365729cfcfa9788c8904a4d.woff) format("woff");
+    unicode-range: u+0020-007e,u+00a0-00ac,u+00ae-0137,u+0139-0148,u+014a-017e,u+018f,u+01a0-01a1,u+01af-01b0,u+01cd-01d4,u+01e6-01e7,u+01f4-01f5,u+01fa-01ff,u+0218-021b,u+0226-0227,u+0232-0233,u+0237,u+0259,u+02bc,u+02c6-02c7,u+02d8-02dd,u+0300-0304,u+0306-030c,u+0312,u+031b,u+0323,u+0326-0328,u+0335-0338,u+0e3f,u+1e0c-1e0d,u+1e20-1e21,u+1e24-1e25,u+1e36-1e37,u+1e44-1e45,u+1e56-1e57,u+1e62-1e63,u+1e6c-1e6d,u+1e80-1e85,u+1e8a-1e8d,u+1e92-1e93,u+1e9e,u+1ea0-1ef9,u+2002-2003,u+2009-200a,u+2010-2011,u+2013-2015,u+2018-201a,u+201c-201e,u+2020-2022,u+2026,u+2030,u+2032-2033,u+2039-203a,u+2044,u+2070,u+2074-2079,u+2080-2089,u+20a6,u+20a9-20aa,u+20ac,u+20b4,u+20b8-20ba,u+20bd,u+20bf,u+2113,u+2116-2117,u+2122,u+2126,u+2160-2169,u+216c-216f,u+2190-2193,u+2196-2199,u+2202,u+2206,u+220f,u+2211-2212,u+2215,u+221a,u+221e,u+222b,u+2248,u+2260,u+2264-2265,u+fb01-fb02,u+ffff
+}
+
+@font-face {
+    font-display: swap;
+    font-family: SpotifyMixUITitleVariable;
+    font-stretch: 50 150;
+    font-weight: 100 1000;
+    src: url(https://encore.scdn.co/fonts/SpotifyMixUITitleVariable-8769ccfde3379b7ebcadd9529b49d0cc.woff2) format("woff2 supports variations"),url(https://encore.scdn.co/fonts/SpotifyMixUITitleVariable-8769ccfde3379b7ebcadd9529b49d0cc.woff2) format("woff2-variations"),url(https://encore.scdn.co/fonts/SpotifyMixUITitleVariable-8769ccfde3379b7ebcadd9529b49d0cc.woff2) format("woff2"),url(https://encore.scdn.co/fonts/SpotifyMixUITitleVariable-280d4cad9e19d3b0d7c7dd08bb600771.woff) format("woff");
+    unicode-range: u+0020-007e,u+00a0-00ac,u+00ae-0137,u+0139-0148,u+014a-017e,u+018f,u+01a0-01a1,u+01af-01b0,u+01cd-01d4,u+01e6-01e7,u+01f4-01f5,u+01fa-01ff,u+0218-021b,u+0226-0227,u+0232-0233,u+0237,u+0259,u+02bc,u+02c6-02c7,u+02d8-02dd,u+0300-0304,u+0306-030c,u+0312,u+031b,u+0323,u+0326-0328,u+0335-0338,u+0e3f,u+1e0c-1e0d,u+1e20-1e21,u+1e24-1e25,u+1e36-1e37,u+1e44-1e45,u+1e56-1e57,u+1e62-1e63,u+1e6c-1e6d,u+1e80-1e85,u+1e8a-1e8d,u+1e92-1e93,u+1e9e,u+1ea0-1ef9,u+2002-2003,u+2009-200a,u+2010-2011,u+2013-2015,u+2018-201a,u+201c-201e,u+2020-2022,u+2026,u+2030,u+2032-2033,u+2039-203a,u+2044,u+2070,u+2074-2079,u+2080-2089,u+20a6,u+20a9-20aa,u+20ac,u+20b4,u+20b8-20ba,u+20bd,u+20bf,u+2113,u+2116-2117,u+2122,u+2126,u+2160-2169,u+216c-216f,u+2190-2193,u+2196-2199,u+2202,u+2206,u+220f,u+2211-2212,u+2215,u+221a,u+221e,u+222b,u+2248,u+2260,u+2264-2265,u+fb01-fb02,u+ffff
+}
+
+/* Spotify Font Classes */
+.spotify-ui {
+    font-family: SpotifyMixUI, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.spotify-title {
+    font-family: SpotifyMixUITitle, SpotifyMixUI, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.spotify-title-variable {
+    font-family: SpotifyMixUITitleVariable, SpotifyMixUITitle, SpotifyMixUI, -apple-system, BlinkMacSystemFont, sans-serif;
+}
