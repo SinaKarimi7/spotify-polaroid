@@ -301,24 +301,26 @@ function App() {
           </div>
 
           {/* Right Column - Canvas Preview */}
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center justify-center">
             {trackData ? (
-              <SpotifyCanvas
-                trackData={trackData}
-                currentTimeMs={currentTimeMs}
-                template={selectedTemplate}
-              />
+              <div className="flex items-center justify-center w-full">
+                <SpotifyCanvas
+                  trackData={trackData}
+                  currentTimeMs={currentTimeMs}
+                  template={selectedTemplate}
+                />
+              </div>
             ) : (
-              <div className="bg-gray-800 rounded-lg p-8 text-center w-full max-w-md">
-                <div className="text-gray-400 mb-4">
-                  <svg className="w-16 h-16 mx-auto mb-4" fill="currentColor" viewBox="0 0 24 24">
+              <div className="flex flex-col items-center justify-center w-full h-full bg-gray-800 rounded-lg p-8">
+                <div className="flex flex-col items-center text-gray-400 mb-4">
+                  <svg className="w-16 h-16 mb-4" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
                   </svg>
+                  <h3 className="text-lg font-semibold mb-2">No Track Selected</h3>
+                  <p className="text-gray-400">
+                    Enter a Spotify track link to generate a poster
+                  </p>
                 </div>
-                <h3 className="text-lg font-semibold mb-2">No Track Selected</h3>
-                <p className="text-gray-400">
-                  Enter a Spotify track link above to generate a poster
-                </p>
               </div>
             )}
           </div>
