@@ -37,7 +37,7 @@ export async function initiateSpotifyLogin() {
     redirect_uri: REDIRECT_URI,
     code_challenge_method: 'S256',
     code_challenge: codeChallenge,
-    scope: '', // No additional scopes needed for basic track info
+    scope: 'user-read-private user-read-email user-library-read', // Required scopes for track access
   });
   
   window.location.href = `https://accounts.spotify.com/authorize?${params}`;

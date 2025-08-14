@@ -155,7 +155,7 @@ function App() {
             {isLoading ? 'Connecting...' : 'Connect with Spotify'}
           </button>
           <p className="text-xs text-gray-500 mt-4">
-            No additional permissions required. We only need to read basic track information.
+            We need permission to read track information from your Spotify account.
           </p>
         </div>
 
@@ -232,7 +232,15 @@ function App() {
 
               {error && (
                 <div className="mt-4 bg-red-900 border border-red-700 text-red-100 px-4 py-3 rounded">
-                  {error}
+                  <p>{error}</p>
+                  {error.includes("Access denied") || error.includes("Authentication expired") ? (
+                    <button 
+                      onClick={handleLogout}
+                      className="mt-2 bg-red-700 hover:bg-red-600 text-white py-1 px-4 rounded text-sm"
+                    >
+                      Log out and try again
+                    </button>
+                  ) : null}
                 </div>
               )}
             </div>

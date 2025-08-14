@@ -57,6 +57,8 @@ export async function fetchTrackData(trackId) {
   if (!response.ok) {
     if (response.status === 401) {
       throw new Error("Authentication expired. Please log in again.");
+    } else if (response.status === 403) {
+      throw new Error("Access denied. Please log out and log in again to grant the necessary permissions.");
     } else if (response.status === 404) {
       throw new Error("Track not found. Please check the track ID.");
     } else if (response.status === 429) {
