@@ -7,7 +7,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [trackInput, setTrackInput] = useState('');
   const [trackData, setTrackData] = useState(null);
-  const [currentTimeMs, setCurrentTimeMs] = useState(8000); // Default to 00:08
+  const [currentTimeMs, setCurrentTimeMs] = useState(0); // Default to 00:01
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -74,7 +74,7 @@ function App() {
       const data = await fetchTrackData(trackId);
       setTrackData(data);
       // Reset time slider to default
-      setCurrentTimeMs(8000);
+      setCurrentTimeMs(0);
     } catch (error) {
       console.error('Fetch track error:', error);
       setError(error.message);

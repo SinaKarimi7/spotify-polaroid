@@ -4,13 +4,13 @@ import PropTypes from 'prop-types';
 // Spotify Icons extracted from the official Spotify web player
 const SpotifyIcons = {
   ChevronDown: () => (
-    <svg role="img" aria-hidden="true" viewBox="0 0 24 24" className="fill-current">
+    <svg role="img" aria-hidden="true" viewBox="0 0 24 24" className="fill-current" style={{ width: '20px', height: '20px' }}>
       <path d="M2.793 8.043a1 1 0 0 1 1.414 0L12 15.836l7.793-7.793a1 1 0 1 1 1.414 1.414L12 18.664 2.793 9.457a1 1 0 0 1 0-1.414" />
     </svg>
   ),
-  MoreHorizontal: () => (
-    <svg role="img" aria-hidden="true" viewBox="0 0 24 24" className="fill-current">
-      <path d="M4.5 13.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3m15 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3m-7.5 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
+  MoreVertical: () => (
+    <svg role="img" aria-hidden="true" viewBox="0 0 24 24" className="fill-current" style={{ width: '20px', height: '20px' }}>
+      <path d="M12 16.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3m0-6a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3m0-6a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3" />
     </svg>
   ),
   Shuffle: () => (
@@ -102,38 +102,38 @@ const SpotifyCanvas = ({ trackData, currentTimeMs }) => {
       {/* Spotify Poster */}
       <div
         ref={posterRef}
-        className="relative bg-gradient-to-b from-gray-900 v-gray-800 to-black flex flex-col rounded-3xl shadow-2xl overflow-hidden spotify-ui"
+        className="relative bg-gradient-to-b from-gray-900 v-gray-800 to-black p-6 flex flex-col rounded-3xl shadow-2xl overflow-hidden spotify-ui"
         style={{
           width: '360px',
           height: '780px'
         }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 text-white">
-          <div className="w-6 h-6">
+        <div className="flex items-center justify-between pb-3 text-white">
+          <div className="w-5 h-5">
             <SpotifyIcons.ChevronDown />
           </div>
-          <div className="text-center">
-            <div className="text-xs text-gray-300 uppercase tracking-wide font-normal">Playing from album</div>
-            <div className="text-xs font-medium">{trackData.albumName || 'Unknown Album'}</div>
+          <div className="flex flex-col gap-1 text-center">
+            <div className="text-[10px] text-gray-300 uppercase tracking-wide font-normal leading-tight">Playing from album</div>
+            <div className="text-[12px] font-medium text-white leading-tight">{trackData.albumName || 'Unknown Album'}</div>
           </div>
-          <div className="w-6 h-6">
-            <SpotifyIcons.MoreHorizontal />
+          <div className="w-5 h-5">
+            <SpotifyIcons.MoreVertical />
           </div>
         </div>
 
         {/* Album Art */}
-        <div className="flex-1 flex items-center justify-center p-8">
-          <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-sm w-full">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-2xl w-full" >
             {trackData.albumImage ? (
               <img
                 src={trackData.albumImage}
                 alt={trackData.name}
-                className="w-full aspect-square object-cover rounded-lg"
+                className="w-full aspect-square object-cover rounded-xl"
                 crossOrigin="anonymous"
               />
             ) : (
-              <div className="w-full aspect-square bg-gray-200 rounded-lg flex items-center justify-center">
+              <div className="w-full aspect-square bg-gray-200 rounded-xl flex items-center justify-center">
                 <span className="text-gray-400 text-4xl">♪</span>
               </div>
             )}
@@ -141,77 +141,72 @@ const SpotifyCanvas = ({ trackData, currentTimeMs }) => {
         </div>
 
         {/* Song Info */}
-        <div className="px-6 pb-4">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-white text-base font-bold spotify-title">{trackData.name || 'Unknown Track'}</h2>
-              <p className="text-gray-300 text-xs font-normal">{trackData.artists?.join(', ') || 'Unknown Artist'}</p>
+        <div className="pb-6">
+          <div className="flex items-start justify-between mb-6">
+            <div className="flex-1 pr-4">
+              <h2 className="text-white text-[20px] font-bold spotify-title leading-tight mb-1">{trackData.name || 'Unknown Track'}</h2>
+              <p className="text-gray-300 text-base font-normal leading-tight">{trackData.artists?.join(', ') || 'Unknown Artist'}</p>
             </div>
-            <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-              <div className="w-3 h-3 text-white">
+            <div className="w-6 h-6 rounded-full flex items-center justify-center mt-1">
+              <div className="w-6 h-6 text-white">
                 <SpotifyIcons.AddToLiked />
               </div>
             </div>
           </div>
 
           {/* Progress Bar */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between text-gray-300 text-xs mb-2 font-normal">
+          <div className="mb-8">
+            <div className="w-full bg-gray-600 rounded-full h-1 mb-2">
+              <div className="bg-white h-1 rounded-full relative px-1" style={{ width: `${progress}%` }}>
+                <div className="w-3 h-3 bg-white rounded-full absolute right-0 top-1/2 transform -translate-y-1/2"></div>
+              </div>
+            </div>
+            <div className="flex items-center justify-between text-gray-300 text-[11px] font-normal">
               <span>{currentTime}</span>
               <span>{totalTime}</span>
-            </div>
-            <div className="w-full bg-gray-500 rounded-full h-1">
-              <div className="bg-white h-1 rounded-full" style={{ width: `${progress}%` }}></div>
             </div>
           </div>
 
           {/* Controls */}
-          <div className="flex items-center justify-center space-x-8 mb-6">
+          <div className="flex items-center justify-between mb-8" >
             {/* Shuffle */}
-            <div className="w-5 h-5 text-gray-300">
+            <div className="min-w-5 min-h-5 text-gray-300">
               <SpotifyIcons.Shuffle />
             </div>
 
             {/* Previous */}
-            <div className="w-6 h-6 text-white">
+            <div className="min-w-6 min-h-6 text-white">
               <SpotifyIcons.SkipBack />
             </div>
 
             {/* Play */}
-            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
-              <div className="w-5 h-5 text-black ml-0.5">
+            <div className="min-w-14 min-h-14 bg-white rounded-full flex items-center justify-center">
+              <div className="w-7 h-7 text-black ml-1">
                 <SpotifyIcons.Play />
               </div>
             </div>
 
             {/* Next */}
-            <div className="w-6 h-6 text-white">
+            <div className="min-w-6 min-h-6 text-white">
               <SpotifyIcons.SkipForward />
             </div>
 
             {/* Repeat */}
-            <div className="w-5 h-5 text-gray-300">
+            <div className="min-w-5 min-h-5 text-gray-300">
               <SpotifyIcons.Repeat />
             </div>
           </div>
 
           {/* Bottom Controls */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              {/* Lyrics */}
-              <svg className="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-              </svg>
-            </div>
-
-            <div className="flex items-center space-x-4">
+          <div className="flex items-center justify-end">
+            <div className="flex items-center space-x-6">
               {/* Share */}
-              <svg className="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="min-w-4 min-h-4 text-gray-300" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z" />
               </svg>
 
               {/* Queue */}
-              <div className="w-5 h-5 text-gray-300">
+              <div className="min-w-4 min-h-4 text-gray-300">
                 <SpotifyIcons.Queue />
               </div>
             </div>
