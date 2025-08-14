@@ -224,7 +224,7 @@ const SpotifyCanvas = ({ trackData, currentTimeMs, template = 'mobile' }) => {
       const html2canvas = (await import('html2canvas')).default;
 
       const canvas = await html2canvas(posterRef.current, {
-        backgroundColor: 'black',
+        backgroundColor: 'transparent',
         scale: 2,
         useCORS: true,
         allowTaint: true,
