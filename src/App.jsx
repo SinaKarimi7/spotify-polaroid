@@ -279,7 +279,7 @@ function App() {
                   <h3 className="text-lg font-semibold mb-4">Poster Template</h3>
 
                   <div className="space-y-3">
-                    <div className="flex space-x-4">
+                    <div className="grid grid-cols-1 gap-3">
                       <label className="flex items-center cursor-pointer">
                         <input
                           type="radio"
@@ -303,10 +303,22 @@ function App() {
                         />
                         <span className="text-white">Polaroid Style</span>
                       </label>
+
+                      <label className="flex items-center cursor-pointer">
+                        <input
+                          type="radio"
+                          name="template"
+                          value="spotify-code"
+                          checked={selectedTemplate === 'spotify-code'}
+                          onChange={(e) => setSelectedTemplate(e.target.value)}
+                          className="mr-2 text-spotify-green focus:ring-spotify-green"
+                        />
+                        <span className="text-white">Spotify Code</span>
+                      </label>
                     </div>
 
                     <p className="text-sm text-gray-400">
-                      Choose between mobile Spotify player or classic polaroid style
+                      Choose between mobile player, polaroid style, or atmospheric Spotify code design
                     </p>
                   </div>
                 </div>

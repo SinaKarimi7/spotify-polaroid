@@ -14,29 +14,33 @@ A client-side web application that generates beautiful Spotify-style poster imag
 
 - 🎵 **Track Input**: Accept Spotify URLs, URIs, or raw track IDs
 - 🎨 **Pixel-Perfect Design**: Recreates Spotify's mobile player interface
-- 🖼️ **Multiple Templates**: Choose between mobile player or polaroid-style designs
+- 🖼️ **Multiple Templates**: Choose between mobile player, polaroid-style, or Spotify code designs
 - 🎭 **Dynamic Theming**: Auto-extracts colors from album art for personalized gradients
 - ⏱️ **Customizable Time**: Adjust the "paused at" moment with a slider
 - 📱 **Responsive Design**: Works on desktop and mobile devices
 - 🖼️ **High-Quality Export**: Download posters as PNG images with dom-to-image
 - 🔐 **Secure Authentication**: Uses Spotify's PKCE flow (no backend required)
+- 📊 **Spotify Codes**: Generate authentic-looking Spotify codes for your tracks
 
 ## Templates
 
-Choose between two stylish templates for your Spotify track images:
+Choose between three stylish templates for your Spotify track images:
 
 <table>
 <tr>
-  <td width="50%" align="center"><strong>Mobile Player Style</strong></td>
-  <td width="50%" align="center"><strong>Polaroid Style</strong></td>
+  <td width="33%" align="center"><strong>Mobile Player Style</strong></td>
+  <td width="33%" align="center"><strong>Polaroid Style</strong></td>
+  <td width="33%" align="center"><strong>Spotify Code Style</strong></td>
 </tr>
 <tr>
-  <td align="center"><img src="./assets/Linkin%20Park%20-%20What%20I've%20Done%20-%20Mobile.png" alt="Mobile Template Example" width="50%"/></td>
-  <td align="center"><img src="./assets/Linkin%20Park%20-%20What%20I've%20Done%20-%20Polaroiod.png" alt="Polaroid Template Example" width="50%"/></td>
+  <td align="center"><img src="./assets/Linkin%20Park%20-%20What%20I've%20Done%20-%20Mobile.png" alt="Mobile Template Example" width="80%"/></td>
+  <td align="center"><img src="./assets/Linkin%20Park%20-%20What%20I've%20Done%20-%20Polaroiod.png" alt="Polaroid Template Example" width="80%"/></td>
+  <td align="center"><em>Coming Soon</em></td>
 </tr>
 <tr>
   <td align="center"><em>A pixel-perfect recreation of Spotify's mobile player with accurate UI elements and dynamic background.</em></td>
   <td align="center"><em>A clean, modern take on the classic Polaroid format featuring album art with Spotify's dynamic color extraction.</em></td>
+  <td align="center"><em>An atmospheric design featuring track name, artist, and a generated Spotify code barcode for scanning.</em></td>
 </tr>
 </table>
 

@@ -42,12 +42,13 @@ Root files:
 
 ### 3. Image Generation (SpotifyCanvas.jsx)
 - **High-Resolution**: 2x scale factor for crisp image output
-- **Multiple Templates**: Mobile player and Polaroid style options
+- **Multiple Templates**: Mobile player, Polaroid style, and Spotify Code options
 - **Dynamic Color Extraction**: Auto-extracts colors from album art for personalized gradients
 - **Pixel-Perfect Design**: Exact recreation of Spotify's mobile player
 - **Dynamic Content**: Real album artwork and track information
 - **Interactive Time**: Adjustable playback position
 - **DOM-to-Image Rendering**: High-quality image generation with proper styling preservation
+- **Spotify Code Generation**: Procedural barcode generation based on track ID
 
 ### 4. User Interface (App.jsx)
 - **Responsive Layout**: Two-column desktop, stacked mobile

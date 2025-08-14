@@ -216,6 +216,43 @@ const SpotifyCanvas = ({ trackData, currentTimeMs, template = 'mobile' }) => {
     }
   }, [trackData?.albumImage]);
 
+  // Generate real Spotify Code using Spotify's undocumented API
+  const generateSpotifyCodeURL = (trackId) => {
+    if (!trackId) return null;
+
+    // Construct Spotify URI from track ID
+    const spotifyURI = `spotify:track:${trackId}`;
+
+    // Try different URL format based on community examples
+    // Option 1: Try with different parameters
+    const backgroundColor = "ffffff"; // Black background (try this first)
+    const barColor = "black"; // White bars
+    const width = "640"; // Larger width
+    const format = "png"; // Try JPEG format
+
+    // The exact format from the community post
+    const codeURL = `https://scannables.scdn.co/uri/plain/${format}/${backgroundColor}/${barColor}/${width}/${spotifyURI}`;
+
+    console.log('Generated Spotify Code URL:', codeURL);
+
+    return codeURL;
+  };
+
+  // Fallback: Generate a visual representation if the API fails
+  const generateFallbackSpotifyCode = (trackId) => {
+    if (!trackId) return [];
+
+    const bars = [];
+    // Create a deterministic pattern from track ID
+    for (let i = 0; i < 40; i++) {
+      const charCode = trackId.charCodeAt(i % trackId.length);
+      const height = (charCode % 8) + 3; // Heights 3-10
+      const width = (charCode % 3) + 1; // Widths 1-3
+      bars.push({ height, width });
+    }
+    return bars;
+  };
+
   const handleDownload = async () => {
     if (!posterRef.current || !trackData) return;
 
@@ -288,6 +325,122 @@ const SpotifyCanvas = ({ trackData, currentTimeMs, template = 'mobile' }) => {
     rgb(${backgroundColors.primary.r}, ${backgroundColors.primary.g}, ${backgroundColors.primary.b}),
     rgb(${backgroundColors.secondary.r}, ${backgroundColors.secondary.g}, ${backgroundColors.secondary.b}))`;
 
+  // Generate Spotify Code URL for the current track
+  const spotifyCodeURL = generateSpotifyCodeURL(trackData?.id);
+  const fallbackBars = generateFallbackSpotifyCode(trackData?.id);
+
+  // Debug: Log the code URL to console
+  console.log('Track ID:', trackData?.id);
+  console.log('Spotify Code URL:', spotifyCodeURL);
+
+  // Render Spotify Code template
+  if (template === 'spotify-code') {
+    return (
+      <div className="flex flex-col items-center space-y-6">
+        {/* Display wrapper with border radius for visual appearance */}
+        <div
+          className="relative"
+          style={{
+            borderRadius: '8px',
+            overflow: 'hidden',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+          }}
+        >
+          {/* Spotify Code Poster - Cover Art Style */}
+          <div
+            ref={posterRef}
+            className="relative spotify-ui"
+            style={{
+              width: '480px',
+              height: '480px', // Square format like album covers
+              border: 'none',
+              outline: 'none',
+              overflow: 'hidden',
+              position: 'relative'
+            }}
+          >
+            {/* Album Art Background */}
+            <div
+              className="absolute inset-0 bg-cover bg-center"
+              style={{
+                backgroundImage: trackData?.albumImage ? `url(${trackData.albumImage})` : 'none',
+                backgroundColor: trackData?.albumImage ? 'transparent' : '#333'
+              }}
+            >
+              {/* Dark overlay for better text readability */}
+              <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+            </div>
+
+            {/* Spotify Logo at top */}
+            <div className="absolute top-6 left-6 z-20">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
+                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 17.317c-.218.361-.678.48-1.04.267-2.848-1.738-6.432-2.134-10.657-1.168-.411.094-.82-.193-.914-.604-.094-.411.193-.82.604-.914 4.613-1.055 8.555-.609 11.737 1.353.36.218.48.678.27 1.066zm1.486-3.301c-.274.446-.858.588-1.304.314-3.258-1.999-8.223-2.575-12.076-1.411-.514.155-1.056-.232-1.211-.746-.155-.514.232-1.056.746-1.211 4.396-1.332 9.974-.691 13.544 1.618.445.275.588.858.31 1.336zm.127-3.438c-3.906-2.32-10.352-2.535-14.077-1.404-.618.187-1.27-.162-1.457-.78-.187-.618.162-1.27.78-1.457 4.262-1.296 11.363-1.044 15.927 1.62.533.311.708 1.007.397 1.54-.311.533-1.007.708-1.54.397l-.03-.016z" />
+              </svg>
+            </div>
+
+            {/* Track Info at top right */}
+            <div className="absolute top-6 right-6 z-20 text-right">
+              <h2 className="text-white text-lg font-bold spotify-title leading-tight mb-1 max-w-48">
+                {trackData?.name || 'Unknown Track'}
+              </h2>
+              <p className="text-gray-200 text-sm font-normal leading-tight">
+                {trackData?.artists?.join(', ') || 'Unknown Artist'}
+              </p>
+            </div>
+
+            {/* Spotify Code at Bottom */}
+            <div className="absolute bottom-0 left-0 right-0 z-20">
+              <div className="bg-white mx-6 mb-6 rounded-lg p-3">
+                {/* Real Spotify Code - Full Width */}
+                <div className="flex items-center justify-center h-16">
+                  {spotifyCodeURL ? (
+                    <img
+                      src={spotifyCodeURL}
+                      alt="Spotify Code"
+                      className="w-full h-full object-contain"
+                      crossOrigin="anonymous"
+                      onError={(e) => {
+                        console.error('Failed to load Spotify Code:', e);
+                        e.target.style.display = 'none';
+                        e.target.nextElementSibling.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
+                  <div
+                    className="flex items-end justify-center h-full w-full"
+                    style={{
+                      display: spotifyCodeURL ? 'none' : 'flex',
+                      gap: '1px'
+                    }}
+                  >
+                    {fallbackBars.map((bar, index) => (
+                      <div
+                        key={index}
+                        className="bg-black"
+                        style={{
+                          width: `${bar.width * 2}px`,
+                          height: `${bar.height * 4}px`,
+                          minHeight: '12px'
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Download Button */}
+        <button
+          onClick={handleDownload}
+          className="px-6 py-3 bg-green-500 text-white font-bold rounded-full hover:bg-green-600 transition-colors spotify-ui"
+        >
+          Download PNG
+        </button>
+      </div>
+    );
+  }
   // Render Polaroid template
   if (template === 'polaroid') {
     return (
@@ -498,6 +651,7 @@ const SpotifyCanvas = ({ trackData, currentTimeMs, template = 'mobile' }) => {
 
 SpotifyCanvas.propTypes = {
   trackData: PropTypes.shape({
+    id: PropTypes.string,
     name: PropTypes.string.isRequired,
     artists: PropTypes.arrayOf(PropTypes.string).isRequired,
     albumName: PropTypes.string.isRequired,
@@ -505,7 +659,7 @@ SpotifyCanvas.propTypes = {
     durationMs: PropTypes.number.isRequired,
   }),
   currentTimeMs: PropTypes.number.isRequired,
-  template: PropTypes.oneOf(['mobile', 'polaroid']),
+  template: PropTypes.oneOf(['mobile', 'polaroid', 'spotify-code']),
 };
 
 export default SpotifyCanvas;
