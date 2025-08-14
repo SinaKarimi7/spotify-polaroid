@@ -104,8 +104,8 @@ const SpotifyCanvas = ({ trackData, currentTimeMs }) => {
         ref={posterRef}
         className="relative bg-gradient-to-b from-gray-900 v-gray-800 to-black flex flex-col rounded-3xl shadow-2xl overflow-hidden spotify-ui"
         style={{
-          width: '300px',
-          height: '650px'
+          width: '360px',
+          height: '780px'
         }}
       >
         {/* Header */}

@@ -14,12 +14,12 @@ function App() {
   // Check authentication status on mount
   useEffect(() => {
     setIsLoggedIn(isAuthenticated());
-    
+
     // Handle OAuth callback
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
     const error = urlParams.get('error');
-    
+
     if (error) {
       setError('Authentication failed. Please try again.');
       // Clean up URL
@@ -133,7 +133,7 @@ function App() {
             background: #1DB954;
             cursor: pointer;
           }
-          
+
           .slider::-moz-range-thumb {
             height: 20px;
             width: 20px;
@@ -150,23 +150,25 @@ function App() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-spotify-dark to-spotify-gray text-white">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Spotify Poster Generator</h1>
-          <button
-            onClick={handleLogout}
-            className="text-sm text-gray-400 hover:text-white transition-colors"
-          >
-            Logout
-          </button>
-        </div>
+
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Column - Input Form */}
           <div className="space-y-6">
+            {/* Header */}
+            <div className="flex justify-between items-center mb-8">
+              <h1 className="text-3xl font-bold">Spotify Poster Generator</h1>
+              <button
+                onClick={handleLogout}
+                className="text-sm text-gray-400 hover:text-white transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+
             <div className="bg-gray-800 rounded-lg p-6">
               <h2 className="text-xl font-semibold mb-4">Track Input</h2>
-              
+
               <div className="space-y-4">
                 <div>
                   <label htmlFor="track-input" className="block text-sm font-medium mb-2">
@@ -182,7 +184,7 @@ function App() {
                     className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-spotify-green"
                   />
                 </div>
-                
+
                 <button
                   onClick={handleFetchTrack}
                   disabled={isLoading || !trackInput.trim()}
@@ -203,13 +205,13 @@ function App() {
             {trackData && (
               <div className="bg-gray-800 rounded-lg p-6">
                 <h3 className="text-lg font-semibold mb-4">Playback Position</h3>
-                
+
                 <div className="space-y-4">
                   <div className="flex justify-between text-sm text-gray-400">
                     <span>{formatDuration(currentTimeMs)}</span>
                     <span>{formatDuration(trackData.durationMs)}</span>
                   </div>
-                  
+
                   <input
                     type="range"
                     min="0"
@@ -219,7 +221,7 @@ function App() {
                     onChange={handleTimeChange}
                     className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
                   />
-                  
+
                   <p className="text-sm text-gray-400">
                     Adjust the playback position shown in the poster
                   </p>
@@ -231,23 +233,23 @@ function App() {
             {trackData && (
               <div className="bg-gray-800 rounded-lg p-6">
                 <h3 className="text-lg font-semibold mb-4">Track Information</h3>
-                
+
                 <div className="space-y-3">
                   <div>
                     <span className="text-gray-400">Title:</span>
                     <p className="font-medium">{trackData.name}</p>
                   </div>
-                  
+
                   <div>
                     <span className="text-gray-400">Artist(s):</span>
                     <p className="font-medium">{trackData.artists.join(', ')}</p>
                   </div>
-                  
+
                   <div>
                     <span className="text-gray-400">Album:</span>
                     <p className="font-medium">{trackData.albumName}</p>
                   </div>
-                  
+
                   <div>
                     <span className="text-gray-400">Duration:</span>
                     <p className="font-medium">{formatDuration(trackData.durationMs)}</p>
@@ -265,7 +267,7 @@ function App() {
               <div className="bg-gray-800 rounded-lg p-8 text-center w-full max-w-md">
                 <div className="text-gray-400 mb-4">
                   <svg className="w-16 h-16 mx-auto mb-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
                   </svg>
                 </div>
                 <h3 className="text-lg font-semibold mb-2">No Track Selected</h3>
@@ -288,7 +290,7 @@ function App() {
           background: #1DB954;
           cursor: pointer;
         }
-        
+
         .slider::-moz-range-thumb {
           height: 20px;
           width: 20px;
