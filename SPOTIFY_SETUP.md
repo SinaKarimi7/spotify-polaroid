@@ -11,8 +11,8 @@ Before you can use this app, you need to create a Spotify application to get you
 ### Step 2: Create a New App
 1. Click **"Create app"** button
 2. Fill in the app details:
-   - **App name**: `Spotify Poster Generator` (or any name you prefer)
-   - **App description**: `A web app that generates poster-style images from Spotify tracks`
+   - **App name**: `Spotify Polaroid` (or any name you prefer)
+   - **App description**: `A web app that generates mobile player and polaroid-style images from Spotify tracks`
    - **Website**: `http://localhost:5173` (for development)
    - **Redirect URI**: `http://localhost:5173/`
    - **Which API/SDKs are you planning to use?**: Select **"Web API"**
@@ -52,6 +52,10 @@ Your app should now be running at http://localhost:5173
 
 - **Redirect URI must match exactly**: The redirect URI in your Spotify app settings must exactly match the one in your `.env` file, including the trailing slash.
 
+- **Multiple Templates**: The app offers both a mobile player template and a polaroid-style template, with dynamic color extraction from album artwork.
+
+- **High-Quality Images**: The app generates high-resolution images using dom-to-image for best quality results.
+
 - **Development only**: The current setup is for development. For production, you'll need to:
   - Update the redirect URI to your production domain
   - Update the `VITE_SPOTIFY_REDIRECT_URI` in your environment variables
@@ -66,10 +70,19 @@ Your app should now be running at http://localhost:5173
 - Check that the redirect URI in your Spotify app settings exactly matches `http://localhost:5173/`
 - Make sure there's a trailing slash
 
+### Authentication errors after login
+- The app has robust error handling for authentication issues
+- If you see an error about failed authentication, try refreshing the page
+- The app will automatically manage authentication state to prevent duplicate token requests
+
 ### App not loading
 - Make sure you've installed dependencies: `npm install`
 - Check that the development server is running on port 5173
 - Try clearing your browser cache
+
+### Image generation issues
+- Ensure you have the latest dom-to-image package installed: `npm install dom-to-image --save`
+- Check browser console for any errors related to image generation
 
 ## Testing the App
 
@@ -78,4 +91,7 @@ Your app should now be running at http://localhost:5173
 3. Log in with your Spotify account and authorize the app
 4. You'll be redirected back to the app
 5. Enter a Spotify track URL (e.g., copy a link from the Spotify app)
-6. Click "Fetch Track" to generate your poster!
+6. Click "Fetch Track" to load the song data
+7. Select your preferred template (Mobile or Polaroid style)
+8. Adjust the playback position if desired
+9. Click "Download PNG" (or "Save Polaroid") to save your image

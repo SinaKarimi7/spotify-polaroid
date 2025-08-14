@@ -1,4 +1,4 @@
-# Spotify Poster Generator
+# Spotify Polaroid
 
 A client-side web application that generates beautiful Spotify-style poster images from track links. Built with React, Vite, and Tailwind CSS using Spotify's PKCE authentication flow.
 
@@ -46,8 +46,8 @@ Choose between two stylish templates for your Spotify track images:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-username/polaroid-spotify.git
-   cd polaroid-spotify
+   git clone https://github.com/SinaKarimi7/spotify-polaroid.git
+   cd spotify-polaroid
    ```
 
 2. **Install dependencies**

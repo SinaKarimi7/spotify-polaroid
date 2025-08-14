@@ -8,7 +8,8 @@ This is a complete Spotify-style poster generator built with React, Vite, and Ta
 src/
 ├── auth.js           # Spotify PKCE authentication utilities
 ├── utils.js          # Utility functions (parsing, formatting, API calls)
-├── SpotifyCanvas.jsx # Canvas rendering component with poster generation
+├── SpotifyCanvas.jsx # Canvas rendering component with multiple templates
+├── SpotifyFonts.css  # Custom fonts for Spotify-accurate typography
 ├── App.jsx           # Main application component with UI and state management
 ├── main.jsx          # React entry point
 └── index.css         # Global styles with Tailwind imports
@@ -32,27 +33,33 @@ Root files:
 - **PKCE Flow**: Secure authentication without client secret
 - **Token Management**: Automatic refresh and persistence
 - **Error Handling**: Graceful handling of auth failures
+- **Auth State Tracking**: Prevents duplicate token requests and improves reliability
 
 ### 2. Input Processing (utils.js)
 - **Flexible Input**: Accepts URLs, URIs, and raw track IDs
 - **API Integration**: Fetches track data with proper error handling
 - **Image Utilities**: Loads and processes album artwork
 
-### 3. Canvas Rendering (SpotifyCanvas.jsx)
-- **High-Resolution**: Fixed 900x1600 canvas for consistent quality
+### 3. Image Generation (SpotifyCanvas.jsx)
+- **High-Resolution**: 2x scale factor for crisp image output
+- **Multiple Templates**: Mobile player and Polaroid style options
+- **Dynamic Color Extraction**: Auto-extracts colors from album art for personalized gradients
 - **Pixel-Perfect Design**: Exact recreation of Spotify's mobile player
 - **Dynamic Content**: Real album artwork and track information
 - **Interactive Time**: Adjustable playback position
+- **DOM-to-Image Rendering**: High-quality image generation with proper styling preservation
 
 ### 4. User Interface (App.jsx)
 - **Responsive Layout**: Two-column desktop, stacked mobile
+- **Template Selection**: Choose between Mobile player or Polaroid style
 - **Real-time Updates**: Live preview as you adjust settings
-- **Error Handling**: User-friendly error messages
+- **Error Handling**: User-friendly error messages with detailed diagnostics
 - **State Management**: Comprehensive React state handling
+- **Authentication Resilience**: Robust error recovery for auth flows
 
 ## Design Specifications
 
-### Canvas Layout (900x1600px)
+### Mobile Player Layout
 1. **Header Section** (0-120px):
    - Dark gradient background
    - "PLAYING FROM ALBUM" text
@@ -81,8 +88,15 @@ Root files:
    - Share and More icons
    - Lyrics tab preview
 
+### Polaroid Layout
+- **Image Area**: Album artwork centered with appropriate scaling
+- **Caption Area**: Track name and artists in bottom section
+- **Clean Design**: Modern interpretation of polaroid format
+- **Dynamic Colors**: Background uses colors extracted from album artwork
+
 ### Color Scheme
-- **Background**: Linear gradient from #121212 to #2b2b2b
+- **Mobile Background**: Dynamic gradient based on album art colors
+- **Polaroid Background**: White frame with album art color gradient for image area
 - **Primary Green**: #1DB954 (Spotify brand color)
 - **White Text**: #FFFFFF for primary content
 - **Gray Text**: rgba(255,255,255,0.7) for secondary content
@@ -102,10 +116,11 @@ Root files:
 
 ## Browser Compatibility
 
-### Canvas Features
-- Uses custom `drawRoundedRect` function for broader browser support
-- High DPI support with device pixel ratio scaling
-- PNG export via HTML5 Canvas API
+### Image Generation Features
+- High-quality PNG export via dom-to-image library
+- 2x scale factor for high DPI output
+- Preserves CSS effects and transforms
+- Multiple template options with consistent styling
 
 ### Modern Web APIs
 - Crypto API for PKCE code generation
@@ -115,9 +130,10 @@ Root files:
 ## Performance Optimizations
 
 1. **Image Loading**: Async loading with error fallbacks
-2. **Canvas Caching**: Memoized drawing functions
+2. **Efficient Color Extraction**: Optimized algorithm for album art analysis
 3. **Component Optimization**: Proper React hooks usage
 4. **Bundle Size**: Tree-shaking enabled via Vite
+5. **Dynamic Imports**: Load dom-to-image only when needed
 
 ## Security Features
 
@@ -125,6 +141,7 @@ Root files:
 2. **Token Refresh**: Automatic token renewal
 3. **Input Validation**: Sanitized track ID parsing
 4. **CORS Handling**: Proper cross-origin image loading
+5. **Auth State Tracking**: Prevents token replay attacks and duplicate requests
 
 ## Development Commands
 
@@ -160,11 +177,26 @@ The application handles various error scenarios:
 - Rate limiting (429 errors)
 - Missing album artwork
 - Browser compatibility issues
+- Duplicate authentication attempts
+- Code verifier storage issues
+- Authentication flow interruptions
+
+## Current Features
+
+1. **Multiple Templates**: 
+   - Mobile Player Style: Recreates Spotify's mobile interface
+   - Polaroid Style: Clean, modern take on the classic polaroid format
+
+2. **Dynamic Color Extraction**: Automatically analyzes album art to create personalized color schemes
+
+3. **High-Quality Image Export**: Generates crisp, detailed images using dom-to-image
+
+4. **Fully Client-Side**: No server required, works entirely in the browser
 
 ## Future Enhancements
 
 Potential improvements:
-1. **Multiple Themes**: Different poster styles
+1. **Additional Templates**: More poster and card styles
 2. **Custom Fonts**: Load Spotify's Circular font
 3. **Batch Processing**: Generate multiple posters
 4. **Social Sharing**: Direct sharing to social platforms
