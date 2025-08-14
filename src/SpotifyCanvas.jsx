@@ -224,16 +224,41 @@ const SpotifyCanvas = ({ trackData, currentTimeMs, template = 'mobile' }) => {
       const html2canvas = (await import('html2canvas')).default;
 
       const canvas = await html2canvas(posterRef.current, {
-        backgroundColor: '#121212',
-        scale: 2, // Higher quality
+        backgroundColor: 'black',
+        scale: 2,
         useCORS: true,
-        allowTaint: true
+        allowTaint: true,
+        logging: false
       });
+
+      // Create a new canvas with rounded corners and 1px crop
+      const finalCanvas = document.createElement('canvas');
+      const finalCtx = finalCanvas.getContext('2d');
+
+      // Crop 1px from each side
+      const cropSize = 2; // 1px * scale(2) = 2px to crop from each side
+      finalCanvas.width = canvas.width - (cropSize * 2);
+      finalCanvas.height = canvas.height - (cropSize * 2);
+
+      // Create rounded rectangle path
+      const radius = 16; // 8px * scale(2)
+      finalCtx.beginPath();
+      finalCtx.roundRect(0, 0, finalCanvas.width, finalCanvas.height, radius);
+      finalCtx.clip();
+
+      // Draw the original canvas onto the rounded canvas, cropping 1px from each side
+      finalCtx.drawImage(
+        canvas,
+        cropSize, cropSize, // Source x, y (crop from top-left)
+        finalCanvas.width, finalCanvas.height, // Source width, height
+        0, 0, // Destination x, y
+        finalCanvas.width, finalCanvas.height // Destination width, height
+      );
 
       // Download the image
       const link = document.createElement('a');
       link.download = `${trackData.name || 'spotify-poster'}.png`;
-      link.href = canvas.toDataURL();
+      link.href = finalCanvas.toDataURL();
       link.click();
     } catch (error) {
       console.error('Failed to generate poster:', error);
@@ -262,49 +287,66 @@ const SpotifyCanvas = ({ trackData, currentTimeMs, template = 'mobile' }) => {
   if (template === 'polaroid') {
     return (
       <div className="flex flex-col items-center space-y-6">
-        {/* Polaroid Poster */}
+        {/* Display wrapper with border radius for visual appearance */}
         <div
-          ref={posterRef}
-          className="relative bg-white rounded-lg shadow-2xl overflow-hidden spotify-ui"
+          className="relative"
           style={{
-            width: '320px',
-            height: '400px'
+            borderRadius: '8px',
+            overflow: 'hidden',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
           }}
         >
-          {/* Polaroid Photo Area */}
-          <div className="relative w-full h-4/5">
-            {/* Dynamic Background */}
-            <div 
-              className="absolute inset-0"
-              style={{ background: dynamicGradient }}
-            />
-            
-            {/* Album Art */}
-            <div className="relative z-10 flex items-center justify-center p-6 h-full">
-              {trackData?.albumImage ? (
-                <img
-                  src={trackData.albumImage}
-                  alt={trackData.name}
-                  className="w-full h-full object-cover rounded-lg shadow-lg"
-                  style={{ maxWidth: '240px', maxHeight: '240px' }}
-                  crossOrigin="anonymous"
-                />
-              ) : (
-                <div className="w-48 h-48 bg-gray-200 rounded-lg flex items-center justify-center">
-                  <span className="text-gray-400 text-4xl">♪</span>
-                </div>
-              )}
-            </div>
-          </div>
+          {/* Polaroid Poster */}
+          <div
+            ref={posterRef}
+            className="relative bg-white spotify-ui"
+            style={{
+              width: '320px',
+              height: '400px',
+              border: 'none',
+              outline: 'none',
+              overflow: 'hidden'
+            }}
+          >
+            {/* Polaroid Photo Area */}
+            <div
+              className="relative w-full h-4/5"
+            >
+              {/* Dynamic Background */}
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: dynamicGradient
+                }}
+              />
 
-          {/* Polaroid Caption Area */}
-          <div className="h-1/5 bg-white flex flex-col justify-center px-6">
-            <h3 className="text-black font-bold text-lg leading-tight mb-1 spotify-title">
-              {trackData?.name || 'Unknown Track'}
-            </h3>
-            <p className="text-gray-600 text-sm font-normal leading-tight">
-              {trackData?.artists?.join(', ') || 'Unknown Artist'}
-            </p>
+              {/* Album Art */}
+              <div className="relative z-10 flex items-center justify-center p-6 h-full">
+                {trackData?.albumImage ? (
+                  <img
+                    src={trackData.albumImage}
+                    alt={trackData.name}
+                    className="w-full h-full object-cover shadow-lg"
+                    style={{ maxWidth: '240px', maxHeight: '240px' }}
+                    crossOrigin="anonymous"
+                  />
+                ) : (
+                  <div className="w-48 h-48 bg-gray-200 flex items-center justify-center">
+                    <span className="text-gray-400 text-4xl">♪</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Polaroid Caption Area */}
+            <div className="h-1/5 bg-white flex flex-col justify-start px-6 pt-4 pb-6">
+              <h3 className="text-black font-bold text-lg leading-tight mb-1 spotify-title">
+                {trackData?.name || 'Unknown Track'}
+              </h3>
+              <p className="text-gray-600 text-sm font-normal leading-tight">
+                {trackData?.artists?.join(', ') || 'Unknown Artist'}
+              </p>
+            </div>
           </div>
         </div>
 
