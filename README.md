@@ -2,14 +2,46 @@
 
 A client-side web application that generates beautiful Spotify-style poster images from track links. Built with React, Vite, and Tailwind CSS using Spotify's PKCE authentication flow.
 
+<div align="center">
+
+## Application Preview
+
+<img src="./assets/preview.png" alt="Application Preview" width="800"/>
+
+</div>
+
 ## Features
 
 - 🎵 **Track Input**: Accept Spotify URLs, URIs, or raw track IDs
 - 🎨 **Pixel-Perfect Design**: Recreates Spotify's mobile player interface
+- 🖼️ **Multiple Templates**: Choose between mobile player or polaroid-style designs
+- 🎭 **Dynamic Theming**: Auto-extracts colors from album art for personalized gradients
 - ⏱️ **Customizable Time**: Adjust the "paused at" moment with a slider
 - 📱 **Responsive Design**: Works on desktop and mobile devices
-- 🖼️ **High-Quality Export**: Download posters as PNG images
+- 🖼️ **High-Quality Export**: Download posters as PNG images with dom-to-image
 - 🔐 **Secure Authentication**: Uses Spotify's PKCE flow (no backend required)
+
+## Templates
+
+Choose between two stylish templates for your Spotify track images:
+
+<div align="center">
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <strong>Mobile Player Style</strong><br>
+      <img src="./assets/Linkin%20Park%20-%20What%20I've%20Done%20-%20Mobile.png" alt="Mobile Template Example" width="300"/><br>
+      <em>A pixel-perfect recreation of Spotify's mobile player with accurate UI elements and dynamic background.</em>
+    </td>
+    <td align="center" width="50%">
+      <strong>Polaroid Style</strong><br>
+      <img src="./assets/Linkin%20Park%20-%20What%20I've%20Done%20-%20Polaroiod.png" alt="Polaroid Template Example" width="300"/><br>
+      <em>A clean, modern take on the classic Polaroid format featuring album art with Spotify's dynamic color extraction.</em>
+    </td>
+  </tr>
+</table>
+
+</div>
 
 ## Setup
 
@@ -24,6 +56,11 @@ A client-side web application that generates beautiful Spotify-style poster imag
    npm install
    ```
 
+   The project uses these key dependencies:
+   - `react` and `react-dom` - UI components
+   - `dom-to-image` - For high-quality image generation
+   - `prop-types` - For component prop validation
+
 3. **Create Spotify App**
    - Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
    - Create a new app
@@ -34,7 +71,7 @@ A client-side web application that generates beautiful Spotify-style poster imag
    ```bash
    cp .env.example .env
    ```
-   
+
    Edit `.env` and add your Spotify credentials:
    ```
    VITE_SPOTIFY_CLIENT_ID=your_spotify_client_id_here
@@ -54,33 +91,36 @@ A client-side web application that generates beautiful Spotify-style poster imag
 1. **Connect with Spotify**: Click the login button to authenticate
 2. **Enter Track Info**: Paste any Spotify track URL, URI, or ID
 3. **Fetch Track Data**: Click "Fetch Track" to load the song information
-4. **Customize Time**: Use the slider to set the playback position
-5. **Download**: Click "Download PNG" to save your poster
+4. **Choose Template**: Select either "Mobile" (default) or "Polaroid" style
+5. **Customize Time**: Use the slider to set the playback position
+6. **Download**: Click "Download PNG" (or "Save Polaroid") to save your image
 
 ### Supported Input Formats
 
-- **URL**: `https://open.spotify.com/track/4iV5W9uYEdYUVa79Axb7Rh`
-- **URI**: `spotify:track:4iV5W9uYEdYUVa79Axb7Rh`
-- **Track ID**: `4iV5W9uYEdYUVa79Axb7Rh`
+- **URL**: `https://open.spotify.com/track/18lR4BzEs7e3qzc0KVkTpU`
+- **URI**: `spotify:track:18lR4BzEs7e3qzc0KVkTpU`
+- **Track ID**: `18lR4BzEs7e3qzc0KVkTpU`
 
 ## Tech Stack
 
 - **React 18** - UI framework
 - **Vite** - Build tool and development server
 - **Tailwind CSS** - Styling framework
-- **HTML5 Canvas** - Image generation
+- **dom-to-image** - High-quality image generation
 - **Spotify Web API** - Track data and authentication
+- **Color Analysis** - Dynamic extraction of album art colors
 
 ## Project Structure
 
 ```
 src/
-├── auth.js           # Spotify PKCE authentication
-├── utils.js          # Utility functions (parsing, formatting, API calls)
-├── SpotifyCanvas.jsx # Canvas rendering component
-├── App.jsx           # Main application component
-├── main.jsx          # React entry point
-└── index.css         # Global styles
+├── auth.js            # Spotify PKCE authentication
+├── utils.js           # Utility functions (parsing, formatting, API calls)
+├── SpotifyCanvas.jsx  # Rendering component with mobile and polaroid templates
+├── SpotifyFonts.css   # Custom fonts for Spotify-accurate typography
+├── App.jsx            # Main application component
+├── main.jsx           # React entry point
+└── index.css          # Global styles
 ```
 
 ## Features in Detail
@@ -91,11 +131,14 @@ src/
 - Automatic token refresh
 - Persistent login state
 
-### Canvas Rendering
-- Fixed 900x1600 pixel canvas for consistent quality
-- High DPI support for crisp images
+### Image Rendering
+- High-quality image generation using dom-to-image
+- Multiple template options (Mobile or Polaroid style)
+- 2x scale factor for crisp, high-resolution output
+- Clean, modern polaroid style with Spotify's color scheme
 - Exact recreation of Spotify's mobile player UI
 - Dynamic album artwork loading with fallbacks
+- Intelligent color extraction from album art for personalized gradients
 
 ### Responsive Design
 - Two-column layout on desktop
