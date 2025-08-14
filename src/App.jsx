@@ -202,69 +202,70 @@ function App() {
               )}
             </div>
 
-            {/* Time Slider */}
+            {/* Controls displayed in a flex layout side by side */}
             {trackData && (
-              <div className="bg-gray-800 rounded-lg p-6">
-                <h3 className="text-lg font-semibold mb-4">Playback Position</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                {/* Time Slider */}
+                <div className="bg-gray-800 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold mb-4">Playback Position</h3>
 
-                <div className="space-y-4">
-                  <div className="flex justify-between text-sm text-gray-400">
-                    <span>{formatDuration(currentTimeMs)}</span>
-                    <span>{formatDuration(trackData.durationMs)}</span>
+                  <div className="space-y-4">
+                    <div className="flex justify-between text-sm text-gray-400">
+                      <span>{formatDuration(currentTimeMs)}</span>
+                      <span>{formatDuration(trackData.durationMs)}</span>
+                    </div>
+
+                    <input
+                      type="range"
+                      min="0"
+                      max={trackData.durationMs}
+                      step="1000"
+                      value={currentTimeMs}
+                      onChange={handleTimeChange}
+                      className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                    />
+
+                    <p className="text-sm text-gray-400">
+                      Adjust the playback position shown in the poster
+                    </p>
                   </div>
-
-                  <input
-                    type="range"
-                    min="0"
-                    max={trackData.durationMs}
-                    step="1000"
-                    value={currentTimeMs}
-                    onChange={handleTimeChange}
-                    className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
-                  />
-
-                  <p className="text-sm text-gray-400">
-                    Adjust the playback position shown in the poster
-                  </p>
                 </div>
-              </div>
-            )}
 
-            {/* Template Selector */}
-            {trackData && (
-              <div className="bg-gray-800 rounded-lg p-6">
-                <h3 className="text-lg font-semibold mb-4">Poster Template</h3>
+                {/* Template Selector */}
+                <div className="bg-gray-800 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold mb-4">Poster Template</h3>
 
-                <div className="space-y-3">
-                  <div className="flex space-x-4">
-                    <label className="flex items-center cursor-pointer">
-                      <input
-                        type="radio"
-                        name="template"
-                        value="mobile"
-                        checked={selectedTemplate === 'mobile'}
-                        onChange={(e) => setSelectedTemplate(e.target.value)}
-                        className="mr-2 text-spotify-green focus:ring-spotify-green"
-                      />
-                      <span className="text-white">Mobile Player</span>
-                    </label>
+                  <div className="space-y-3">
+                    <div className="flex space-x-4">
+                      <label className="flex items-center cursor-pointer">
+                        <input
+                          type="radio"
+                          name="template"
+                          value="mobile"
+                          checked={selectedTemplate === 'mobile'}
+                          onChange={(e) => setSelectedTemplate(e.target.value)}
+                          className="mr-2 text-spotify-green focus:ring-spotify-green"
+                        />
+                        <span className="text-white">Mobile Player</span>
+                      </label>
 
-                    <label className="flex items-center cursor-pointer">
-                      <input
-                        type="radio"
-                        name="template"
-                        value="polaroid"
-                        checked={selectedTemplate === 'polaroid'}
-                        onChange={(e) => setSelectedTemplate(e.target.value)}
-                        className="mr-2 text-spotify-green focus:ring-spotify-green"
-                      />
-                      <span className="text-white">Polaroid Style</span>
-                    </label>
+                      <label className="flex items-center cursor-pointer">
+                        <input
+                          type="radio"
+                          name="template"
+                          value="polaroid"
+                          checked={selectedTemplate === 'polaroid'}
+                          onChange={(e) => setSelectedTemplate(e.target.value)}
+                          className="mr-2 text-spotify-green focus:ring-spotify-green"
+                        />
+                        <span className="text-white">Polaroid Style</span>
+                      </label>
+                    </div>
+
+                    <p className="text-sm text-gray-400">
+                      Choose between mobile Spotify player or classic polaroid style
+                    </p>
                   </div>
-
-                  <p className="text-sm text-gray-400">
-                    Choose between mobile Spotify player or classic polaroid style
-                  </p>
                 </div>
               </div>
             )}
@@ -302,9 +303,9 @@ function App() {
           {/* Right Column - Canvas Preview */}
           <div className="flex flex-col items-center">
             {trackData ? (
-              <SpotifyCanvas 
-                trackData={trackData} 
-                currentTimeMs={currentTimeMs} 
+              <SpotifyCanvas
+                trackData={trackData}
+                currentTimeMs={currentTimeMs}
                 template={selectedTemplate}
               />
             ) : (
